@@ -27,12 +27,16 @@
 //
 //////////////////////////////////////////////////////////////////////////////////////
 
+let app: Main = null;
+
 class Main extends egret.DisplayObjectContainer {
-    private mainBoard: MainBoard;
-    private leftControl: LeftControl;
+    public mainBoard: MainBoard;
+    public leftControl: LeftControl;
+    public modalManager: ModalManager;
 
     public constructor() {
         super();
+        app = this;
         this.addEventListener(egret.Event.ADDED_TO_STAGE, this.onAddToStage, this);
     }
 
@@ -94,6 +98,8 @@ class Main extends egret.DisplayObjectContainer {
         this.addChild(this.mainBoard);
         this.leftControl = new LeftControl();
         this.addChild(this.leftControl);
+        this.modalManager = new ModalManager();
+        this.addChild(this.modalManager);
     }
 
     private createGameBG() {

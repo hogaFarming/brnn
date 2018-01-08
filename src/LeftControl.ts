@@ -52,6 +52,7 @@ class LeftControl extends egret.Sprite {
 
     private onClickBackBtn(): void {
         console.log("click panel btn");
+        app.modalManager.openHelpModal();
     }
 
     public togglePanel(): void {

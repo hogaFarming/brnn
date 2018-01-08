@@ -71,10 +71,12 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var app = null;
 var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         var _this = _super.call(this) || this;
+        app = _this;
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddToStage, _this);
         return _this;
     }
@@ -158,6 +160,8 @@ var Main = (function (_super) {
         this.addChild(this.mainBoard);
         this.leftControl = new LeftControl();
         this.addChild(this.leftControl);
+        this.modalManager = new ModalManager();
+        this.addChild(this.modalManager);
     };
     Main.prototype.createGameBG = function () {
         var bg = new egret.Sprite();
@@ -168,3 +172,4 @@ var Main = (function (_super) {
     return Main;
 }(egret.DisplayObjectContainer));
 __reflect(Main.prototype, "Main");
+//# sourceMappingURL=Main.js.map

@@ -51,6 +51,7 @@ var LeftControl = (function (_super) {
     };
     LeftControl.prototype.onClickBackBtn = function () {
         console.log("click panel btn");
+        app.modalManager.openHelpModal();
     };
     LeftControl.prototype.togglePanel = function () {
         this.panel.visible = !this.panel.visible;
@@ -67,3 +68,4 @@ var LeftControl = (function (_super) {
     return LeftControl;
 }(egret.Sprite));
 __reflect(LeftControl.prototype, "LeftControl");
+//# sourceMappingURL=LeftControl.js.map

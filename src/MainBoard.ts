@@ -109,18 +109,9 @@ class MainBoard extends egret.DisplayObjectContainer {
 
     private createBitmap(name: string): egret.Bitmap {
         let result = new egret.Bitmap();
-        let texture: egret.Texture = this.getRes(name);
+        let texture: egret.Texture = utils.getRes(name);
         result.texture = texture;
         return result;
-    }
-
-    private getRes(name: string): egret.Texture {
-        let arr = name.split('.');
-        if (arr.length === 1) {
-            return RES.getRes(name);
-        } else {
-            return RES.getRes(arr[0]).getTexture(arr[1]);
-        }
     }
 
     private onClickHistory(): void {

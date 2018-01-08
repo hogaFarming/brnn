@@ -49,6 +49,12 @@ var ButtonModels = {
         normal: { x: 0, y: 0, h: 80 },
         hover: { x: 0, y: 81, h: 80 },
         pressed: { x: 0, y: 162, h: 80 }
+    },
+    CloseBtn: {
+        resName: "brnn_cards.quit",
+        normal: { x: 0, y: 0, h: 60 },
+        hover: { x: 0, y: 61, h: 61 },
+        pressed: { x: 0, y: 129, h: 52 }
     }
 };
 var globalButtonFactory = null;
@@ -81,3 +87,4 @@ var ButtonFactory = (function () {
     return ButtonFactory;
 }());
 __reflect(ButtonFactory.prototype, "ButtonFactory");
+//# sourceMappingURL=ButtonFactory.js.map

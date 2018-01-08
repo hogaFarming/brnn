@@ -1,0 +1,80 @@
+class Tab extends egret.Sprite {
+
+    private bitmap: egret.Bitmap;
+    private activeBitmap: egret.Bitmap;
+
+    constructor(bitmap: egret.Bitmap, activeBitmap: egret.Bitmap, isActive?: boolean) {
+        super();
+        this.bitmap = bitmap;
+        this.activeBitmap = activeBitmap;
+        this.addChild(isActive ? this.activeBitmap : this.bitmap);
+        this.touchEnabled = true;
+    }
+
+    // private init(): void {
+    //     this.addChild(this.bitmap);
+    //     this.touchEnabled = true;
+    // }
+
+    public setActive(active: boolean) {
+        this.removeChildAt(0);
+        this.addChild(active ? this.activeBitmap : this.bitmap);
+    }
+}
+
+class HelpWindow extends egret.Sprite implements ModalLifeCycle {
+
+    private activeIdx: number = 0;
+    private tabs: Array<Tab>;
+    private contents: Array<egret.Sprite>;
+
+    constructor() {
+        super();
+        this.init();
+    }
+
+    private init(): void {
+        let bg = new egret.Bitmap(utils.getRes("brnn_env.help_bg"));
+        this.addChild(bg);
+        this.tabs = this.createTabs();
+    }
+
+    private createTabs(): Array<Tab> {
+        let tabs = [
+            ["brnn_cards.help_btn1_0", "brnn_cards.help_btn2_0", 152, 44],
+            ["brnn_cards.help_btn1_1", "brnn_cards.help_btn2_1", 315, 44],
+            ["brnn_cards.help_btn1_2", "brnn_cards.help_btn2_2", 479, 44]
+        ].map((info, index) => {
+            let tab = this.createTab(<string>info[0], <string>info[1]);
+            tab.x = <number>info[2];
+            tab.y = <number>info[3];
+            if (index === this.activeIdx) {
+                tab.setActive(true);
+            }
+            tab.addEventListener(egret.TouchEvent.TOUCH_TAP, this.toggleTab.bind(this, index), this);
+            this.addChild(tab);
+            return tab;
+        });
+        return tabs;
+    }
+
+    private toggleTab(index: number): void {
+        this.activeIdx = index;
+        this.tabs.forEach((item, idx) => {
+            item.setActive(idx === index);
+        });
+    }
+
+    private createTab(resName: string, activeResName: string): Tab {
+        let bm = new egret.Bitmap(utils.getRes(resName));
+        let bmActive = new egret.Bitmap(utils.getRes(activeResName));
+        return new Tab(bm, bmActive);
+    }
+
+    public onOpen(): boolean {
+        return true;
+    }
+    public onClose(): boolean {
+        return true;
+    }
+}

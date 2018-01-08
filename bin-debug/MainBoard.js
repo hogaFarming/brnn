@@ -90,18 +90,9 @@ var MainBoard = (function (_super) {
     };
     MainBoard.prototype.createBitmap = function (name) {
         var result = new egret.Bitmap();
-        var texture = this.getRes(name);
+        var texture = utils.getRes(name);
         result.texture = texture;
         return result;
-    };
-    MainBoard.prototype.getRes = function (name) {
-        var arr = name.split('.');
-        if (arr.length === 1) {
-            return RES.getRes(name);
-        }
-        else {
-            return RES.getRes(arr[0]).getTexture(arr[1]);
-        }
     };
     MainBoard.prototype.onClickHistory = function () {
         console.log("on click.");
@@ -109,3 +100,4 @@ var MainBoard = (function (_super) {
     return MainBoard;
 }(egret.DisplayObjectContainer));
 __reflect(MainBoard.prototype, "MainBoard");
+//# sourceMappingURL=MainBoard.js.map
