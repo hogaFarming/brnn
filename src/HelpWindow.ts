@@ -26,7 +26,8 @@ class HelpWindow extends egret.Sprite implements ModalLifeCycle {
 
     private activeIdx: number = 0;
     private tabs: Array<Tab>;
-    private contents: Array<egret.Sprite>;
+    private scrollView: egret.ScrollView;
+    private contents: Array<egret.Bitmap>;
 
     constructor() {
         super();
@@ -34,9 +35,12 @@ class HelpWindow extends egret.Sprite implements ModalLifeCycle {
     }
 
     private init(): void {
+        this.width = 752;
+        this.height = 502;
         let bg = new egret.Bitmap(utils.getRes("brnn_env.help_bg"));
         this.addChild(bg);
         this.tabs = this.createTabs();
+        this.createContents();
     }
 
     private createTabs(): Array<Tab> {
@@ -58,11 +62,25 @@ class HelpWindow extends egret.Sprite implements ModalLifeCycle {
         return tabs;
     }
 
+    private createContents() {
+        this.contents = ["brnn_env.help1", "brnn_env.help2", "help3_png"]
+            .map(resName => new egret.Bitmap(utils.getRes(resName)));
+        let scrollView = this.scrollView = new egret.ScrollView();
+        scrollView.width = 672;
+        scrollView.height = 375;
+        scrollView.x = 38;
+        scrollView.y = 100;
+        scrollView.setContent(this.contents[this.activeIdx]);
+        this.addChild(scrollView);
+    }
+
     private toggleTab(index: number): void {
         this.activeIdx = index;
         this.tabs.forEach((item, idx) => {
             item.setActive(idx === index);
         });
+        this.scrollView.scrollTop = 0;
+        this.scrollView.setContent(this.contents[index]);
     }
 
     private createTab(resName: string, activeResName: string): Tab {

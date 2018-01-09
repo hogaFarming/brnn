@@ -33,6 +33,7 @@ class Main extends egret.DisplayObjectContainer {
     public mainBoard: MainBoard;
     public leftControl: LeftControl;
     public modalManager: ModalManager;
+    private appLoading: AppLoading;
 
     public constructor() {
         super();
@@ -96,10 +97,11 @@ class Main extends egret.DisplayObjectContainer {
         this.createGameBG();
         this.mainBoard = new MainBoard();
         this.addChild(this.mainBoard);
-        this.leftControl = new LeftControl();
-        this.addChild(this.leftControl);
+        this.showLoading();
         this.modalManager = new ModalManager();
         this.addChild(this.modalManager);
+        this.leftControl = new LeftControl();
+        this.addChild(this.leftControl);
     }
 
     private createGameBG() {
@@ -107,5 +109,17 @@ class Main extends egret.DisplayObjectContainer {
         let bgImg: egret.Bitmap = new egret.Bitmap(RES.getRes("BG_png"));
         bg.addChild(bgImg);
         this.addChild(bg);
+    }
+
+    public showLoading(): void {
+        if (!this.appLoading) {
+            this.appLoading = new AppLoading();
+            this.addChild(this.appLoading);
+        }
+        this.appLoading.visible = true;
+    }
+
+    public hideLoading(): void {
+        this.appLoading.visible = false;
     }
 }

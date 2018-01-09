@@ -158,16 +158,27 @@ var Main = (function (_super) {
         this.createGameBG();
         this.mainBoard = new MainBoard();
         this.addChild(this.mainBoard);
-        this.leftControl = new LeftControl();
-        this.addChild(this.leftControl);
+        this.showLoading();
         this.modalManager = new ModalManager();
         this.addChild(this.modalManager);
+        this.leftControl = new LeftControl();
+        this.addChild(this.leftControl);
     };
     Main.prototype.createGameBG = function () {
         var bg = new egret.Sprite();
         var bgImg = new egret.Bitmap(RES.getRes("BG_png"));
         bg.addChild(bgImg);
         this.addChild(bg);
+    };
+    Main.prototype.showLoading = function () {
+        if (!this.appLoading) {
+            this.appLoading = new AppLoading();
+            this.addChild(this.appLoading);
+        }
+        this.appLoading.visible = true;
+    };
+    Main.prototype.hideLoading = function () {
+        this.appLoading.visible = false;
     };
     return Main;
 }(egret.DisplayObjectContainer));

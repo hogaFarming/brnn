@@ -26,7 +26,7 @@ class Modal extends egret.Sprite {
     }
 
     private init(): void {
-        // this.visible = false;
+        this.visible = false;
 
         let blackBG = new egret.Bitmap(utils.getRes("blackBG_png"));
         this.addChild(blackBG);

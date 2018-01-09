@@ -22,7 +22,7 @@ var Modal = (function (_super) {
         return _this;
     }
     Modal.prototype.init = function () {
-        // this.visible = false;
+        this.visible = false;
         var blackBG = new egret.Bitmap(utils.getRes("blackBG_png"));
         this.addChild(blackBG);
         this.wind.x = (1280 - this.wind.width) / 2;

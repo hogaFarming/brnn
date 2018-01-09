@@ -38,9 +38,12 @@ var HelpWindow = (function (_super) {
         return _this;
     }
     HelpWindow.prototype.init = function () {
+        this.width = 752;
+        this.height = 502;
         var bg = new egret.Bitmap(utils.getRes("brnn_env.help_bg"));
         this.addChild(bg);
         this.tabs = this.createTabs();
+        this.createContents();
     };
     HelpWindow.prototype.createTabs = function () {
         var _this = this;
@@ -61,11 +64,24 @@ var HelpWindow = (function (_super) {
         });
         return tabs;
     };
+    HelpWindow.prototype.createContents = function () {
+        this.contents = ["brnn_env.help1", "brnn_env.help2", "help3_png"]
+            .map(function (resName) { return new egret.Bitmap(utils.getRes(resName)); });
+        var scrollView = this.scrollView = new egret.ScrollView();
+        scrollView.width = 672;
+        scrollView.height = 375;
+        scrollView.x = 38;
+        scrollView.y = 100;
+        scrollView.setContent(this.contents[this.activeIdx]);
+        this.addChild(scrollView);
+    };
     HelpWindow.prototype.toggleTab = function (index) {
         this.activeIdx = index;
         this.tabs.forEach(function (item, idx) {
             item.setActive(idx === index);
         });
+        this.scrollView.scrollTop = 0;
+        this.scrollView.setContent(this.contents[index]);
     };
     HelpWindow.prototype.createTab = function (resName, activeResName) {
         var bm = new egret.Bitmap(utils.getRes(resName));

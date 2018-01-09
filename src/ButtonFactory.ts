@@ -14,25 +14,25 @@ type ButtonModel = {
 const ButtonModels = {
     HistoryButton: {
         resName: "brnn_env.historyBtn",
-        normal: { x: 0, y: 0, h: 89 },
+        normal: { x: 0, y: 2, h: 89 },
         hover: { x: 0, y: 93, h: 89 },
         pressed: { x: 0, y: 180, h: 89 }
     },
     DealerListButton: {
         resName: "brnn_env.dealerList",
-        normal: { x: 0, y: 0, h: 98 },
+        normal: { x: 0, y: 2, h: 98 },
         hover: { x: 0, y: 98, h: 98 },
         pressed: { x: 0, y: 200, h: 98 }
     },
     BeDealerButton: {
         resName: "brnn_env.beDealer",
-        normal: { x: 0, y: 0, h: 98 },
+        normal: { x: 0, y: 2, h: 98 },
         hover: { x: 0, y: 98, h: 98 },
         pressed: { x: 0, y: 200, h: 98 }
     },
     BePlayerButton: {
         resName: "brnn_env.bePlayer",
-        normal: { x: 0, y: 0, h: 98 },
+        normal: { x: 0, y: 2, h: 98 },
         hover: { x: 0, y: 98, h: 98 },
         pressed: { x: 0, y: 200, h: 98 }
     },
@@ -62,7 +62,7 @@ const ButtonModels = {
     },
     CloseBtn: {
         resName: "brnn_cards.quit",
-        normal: { x: 0, y: 0, h: 60 },
+        normal: { x: 0, y: 4, h: 57 },
         hover: { x: 0, y: 61, h: 61 },
         pressed: { x: 0, y: 129, h: 52 }
     }
