@@ -32,6 +32,7 @@ class Button extends egret.Sprite {
     }
 
     private onTouchTap(event: egret.Event) {
+        app.playEffectSound("ClickSound_wav");
         let clickEvt = new ButtonEvent(ButtonEvent.CLICK);
         this.dispatchEvent(clickEvt);
     }

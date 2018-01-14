@@ -30,6 +30,7 @@ class Modal extends egret.Sprite {
 
         let blackBG = new egret.Bitmap(utils.getRes("blackBG_png"));
         this.addChild(blackBG);
+        blackBG.touchEnabled = true;
 
         this.wind.x = (1280 - this.wind.width) / 2;
         this.wind.y = (720 - this.wind.height) / 2;

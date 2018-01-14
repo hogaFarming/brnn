@@ -1,6 +1,13 @@
 var __reflect = (this && this.__reflect) || function (p, c, t) {
     p.__class__ = c, t ? t.push(c) : t = [c], p.__types__ = p.__types__ ? t.concat(p.__types__) : t;
 };
+var __extends = this && this.__extends || function __extends(t, e) { 
+ function r() { 
+ this.constructor = t;
+}
+for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
+r.prototype = e.prototype, t.prototype = new r();
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     return new (P || (P = Promise))(function (resolve, reject) {
         function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
@@ -36,27 +43,210 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
-var DebugPlatform = (function () {
-    function DebugPlatform() {
+var user_test = "";
+var RemoteEvent = (function (_super) {
+    __extends(RemoteEvent, _super);
+    function RemoteEvent(type, bubbles, cancelable) {
+        if (bubbles === void 0) { bubbles = false; }
+        if (cancelable === void 0) { cancelable = false; }
+        return _super.call(this, type, bubbles, cancelable) || this;
     }
-    DebugPlatform.prototype.getUserInfo = function () {
+    RemoteEvent.BET = "bet";
+    RemoteEvent.GAME_CREATE = "game_create";
+    RemoteEvent.GAME_RECEIVED_RESULT = "game_received_result";
+    return RemoteEvent;
+}(egret.Event));
+__reflect(RemoteEvent.prototype, "RemoteEvent");
+var WeixinPlatform = (function (_super) {
+    __extends(WeixinPlatform, _super);
+    function WeixinPlatform() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    WeixinPlatform.prototype.getGameConfig = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var res, config;
             return __generator(this, function (_a) {
-                return [2 /*return*/, { nickName: "username" }];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/gameinfo_niuniu")];
+                    case 1:
+                        res = _a.sent();
+                        config = res.data.config;
+                        this.connectSocket(config.ip, config.port);
+                        return [2 /*return*/, { nickName: "username" }];
+                }
             });
         });
     };
-    DebugPlatform.prototype.login = function () {
+    WeixinPlatform.prototype.getGameState = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var res;
             return __generator(this, function (_a) {
-                return [2 /*return*/];
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/game_info_now")];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/, res.data];
+                }
             });
         });
     };
-    return DebugPlatform;
-}());
-__reflect(DebugPlatform.prototype, "DebugPlatform", ["Platform"]);
+    WeixinPlatform.prototype.getGameResult = function (gameId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var res, evt;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/game_result", { params: { id: gameId } })];
+                    case 1:
+                        res = _a.sent();
+                        if (res.data.status === 0)
+                            return [2 /*return*/, null];
+                        evt = new RemoteEvent(RemoteEvent.GAME_RECEIVED_RESULT);
+                        evt.data = res.data;
+                        this.dispatchEvent(evt);
+                        return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.login = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (!utils.url.params("usertest")) return [3 /*break*/, 1];
+                        user_test = utils.url.params("usertest");
+                        return [3 /*break*/, 3];
+                    case 1: return [4 /*yield*/, this._login()];
+                    case 2:
+                        _a.sent();
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.connectSocket = function (address, port) {
+        this.ws = new egret.WebSocket();
+        this.ws.addEventListener(egret.ProgressEvent.SOCKET_DATA, this.onSocketData, this);
+        this.ws.addEventListener(egret.Event.CONNECT, this.onSocketOpen, this);
+        this.ws.connect(address, port);
+    };
+    WeixinPlatform.prototype.onSocketOpen = function () {
+        var cmd = "Hello Egret WebSocket";
+        console.log("连接成功，发送数据：" + cmd);
+        // this.ws.writeUTF(cmd);
+    };
+    WeixinPlatform.prototype.onSocketData = function (e) {
+        var msg = this.ws.readUTF();
+        try {
+            var parsed = JSON.parse(msg);
+            if (parsed.type === "connection") {
+                var clientId = parsed.data;
+                this.bindSocket(clientId);
+            }
+            else if (parsed.type === "game_create") {
+                var evt = new RemoteEvent(RemoteEvent.GAME_CREATE);
+                evt.data = {
+                    game_id: parsed.game_id,
+                    lottery_time: parsed.lottery_time,
+                    no_betting_time: parsed.no_betting_time
+                };
+                this.dispatchEvent(evt);
+            }
+            else if (parsed.type === "game_result") {
+                var game_id = parsed.game_id;
+                this.getGameResult(game_id);
+            }
+        }
+        catch (e) {
+            console.error("解析socket数据出错, ", msg);
+        }
+    };
+    WeixinPlatform.prototype.bindSocket = function (clientId) {
+        var data = {
+            client_id: clientId,
+            type: 1 // 游戏类型（0\|推币机，1\|牛牛）
+        };
+        var res = http.post("/api/bind", { data: data });
+    };
+    WeixinPlatform.prototype._login = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var loginStatus, isAuth, callbackUrl, apiToken, url;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        loginStatus = utils.cache.get("isLogin");
+                        if (!(!loginStatus || loginStatus === "0")) return [3 /*break*/, 2];
+                        isAuth = utils.cache.get("isAuth");
+                        if (isAuth === "1")
+                            return [2 /*return*/];
+                        callbackUrl = location.href;
+                        return [4 /*yield*/, http.getApiToken()];
+                    case 1:
+                        apiToken = _a.sent();
+                        url = Http.URL_BASE + "/api/wechat/auth" +
+                            "?callback=" + (encodeURIComponent(callbackUrl)) +
+                            "&token=" + apiToken +
+                            "&type=mp";
+                        utils.cache.set("isLogin", "2");
+                        window.location.href = url;
+                        return [3 /*break*/, 3];
+                    case 2:
+                        if (loginStatus === "2") {
+                            return [2 /*return*/, this.judgeLogin()];
+                        }
+                        else {
+                        }
+                        _a.label = 3;
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.judgeLogin = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res, e_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 7, , 9]);
+                        return [4 /*yield*/, http.get("/api/judge/logins?usertest=74")];
+                    case 1:
+                        res = _a.sent();
+                        if (!(res.data.is_auth === 1 && res.data.is_user === 0)) return [3 /*break*/, 2];
+                        utils.cache.set("isLogin", "0");
+                        utils.cache.set("isAuth", "1");
+                        // TODO
+                        console.error("已通过微信认证，但是未登录？");
+                        return [3 /*break*/, 6];
+                    case 2:
+                        if (!(res.data.is_auth === 0)) return [3 /*break*/, 4];
+                        utils.cache.set("isAuth", "0");
+                        utils.cache.set("isLogin", "0");
+                        return [4 /*yield*/, this._login()];
+                    case 3: return [2 /*return*/, _a.sent()];
+                    case 4:
+                        if (!(res.data.is_auth === 1 && res.data.is_user === 1)) return [3 /*break*/, 6];
+                        utils.cache.set("isAuth", "1");
+                        utils.cache.set("isLogin", "1");
+                        return [4 /*yield*/, this._login()];
+                    case 5: return [2 /*return*/, _a.sent()];
+                    case 6: return [3 /*break*/, 9];
+                    case 7:
+                        e_1 = _a.sent();
+                        utils.cache.set("isAuth", "0");
+                        utils.cache.set("isLogin", "0");
+                        return [4 /*yield*/, this._login()];
+                    case 8: return [2 /*return*/, _a.sent()];
+                    case 9: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    return WeixinPlatform;
+}(egret.EventDispatcher));
+__reflect(WeixinPlatform.prototype, "WeixinPlatform", ["Platform"]);
 if (!window.platform) {
-    window.platform = new DebugPlatform();
+    window.platform = new WeixinPlatform();
 }
 //# sourceMappingURL=Platform.js.map

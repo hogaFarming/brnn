@@ -15,6 +15,7 @@ var MainBoard = (function (_super) {
     __extends(MainBoard, _super);
     function MainBoard() {
         var _this = _super.call(this) || this;
+        _this.betChips = []; // 已下筹码
         _this.addSprites();
         return _this;
     }
@@ -27,12 +28,13 @@ var MainBoard = (function (_super) {
         this.txtDealerMoney = this.createInfoText("0", 120, 75);
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
-        this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.onClickHistory, 263, 610);
-        this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.onClickHistory, 955, 610);
-        this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.onClickHistory, 1120, 610);
-        this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.onClickHistory, 1120, 610);
+        this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.showHistory, 263, 610);
+        this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.showDealerList, 955, 610);
+        this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.handleBeDealer, 1120, 610);
+        this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
         this.chips = this.createChips();
+        this.spPlayerAreas = this.createPlayerAreas();
     };
     MainBoard.prototype.createButton = function (btnModel, clickHandler, x, y) {
         var btnFactory = new ButtonFactory();
@@ -69,6 +71,7 @@ var MainBoard = (function (_super) {
             chip.y = chipY;
             result.push(chip);
             _this.addChild(chip);
+            chip.touchEnabled = true;
             chip.addEventListener(egret.TouchEvent.TOUCH_TAP, function (event) {
                 console.log('click chip');
                 _this.selectChip(index);
@@ -76,7 +79,98 @@ var MainBoard = (function (_super) {
         });
         return result;
     };
+    MainBoard.prototype.createPlayerAreas = function () {
+        var _this = this;
+        var areaInfos = [
+            { resName: "brnn_env.bottomGlow_4", x: 342, y: 70 },
+            { resName: "brnn_env.bottomGlow_0", x: 0, y: 200 },
+            { resName: "brnn_env.bottomGlow_1", x: 272, y: 234 },
+            { resName: "brnn_env.bottomGlow_2", x: 612, y: 235 },
+            { resName: "brnn_env.bottomGlow_3", x: 880, y: 200 },
+        ];
+        var result = areaInfos.map(function (info, idx) {
+            var sp = new egret.Sprite();
+            sp.graphics.beginFill(0x000000, 0);
+            var bitmap = new egret.Bitmap(utils.getRes(info.resName));
+            sp.graphics.drawRect(0, 0, bitmap.width, bitmap.height);
+            sp.graphics.endFill();
+            sp.addChild(bitmap);
+            sp.width = bitmap.width;
+            sp.height = bitmap.height;
+            bitmap.visible = false;
+            sp.x = info.x;
+            sp.y = info.y;
+            _this.addChild(sp);
+            sp.touchEnabled = true;
+            if (idx !== 0) {
+                sp.addEventListener(egret.TouchEvent.TOUCH_TAP, function (e) {
+                    // console.log(e);
+                    var padding = 80;
+                    if ((e.stageX - sp.x) > padding
+                        && (e.stageX + padding) < (sp.x + sp.width)
+                        && (e.stageY - sp.y) > padding
+                        && (e.stageY + padding) < (sp.y + sp.height)) {
+                        _this.handlePlayerAreaClick(idx);
+                    }
+                }, _this);
+            }
+            return sp;
+        });
+        return result;
+    };
+    MainBoard.prototype.handlePlayerAreaClick = function (index) {
+        // TODO 限制下注时间
+        if (this.chipIdx === undefined)
+            return;
+        var amount = this.chips[this.chipIdx].value;
+        app.postBet(index, amount);
+        // this.showBetAnimation(amount, index);
+    };
+    MainBoard.prototype.showBetAnimation = function (value, playerIdx) {
+        var _this = this;
+        var originChip = this.chips.filter(function (item) { return item.value === value; })[0];
+        if (!originChip)
+            return;
+        app.playEffectSound("SoundChouMa_wav");
+        var spArea = this.spPlayerAreas[playerIdx];
+        var padding = 120;
+        var width = spArea.width - (padding * 2);
+        var height = spArea.height - (padding * 2);
+        var targetX = spArea.x + Math.round(Math.random() * width) + padding;
+        var targetY = spArea.y + Math.round(Math.random() * height) + padding;
+        var startX = originChip.x;
+        var startY = originChip.y;
+        var currX = startX;
+        var currY = startY;
+        var lastFrameTime = egret.getTimer();
+        var speed = 200;
+        var chip = new Chip(value);
+        chip.x = currX;
+        chip.y = currY;
+        chip.scaleX = 0.65;
+        chip.scaleY = 0.65;
+        chip.anchorOffsetX = 50;
+        chip.anchorOffsetY = 50;
+        this.addChild(chip);
+        this.betChips.push(chip);
+        var onEnterFrame = function () {
+            var now = egret.getTimer();
+            var pass = now - lastFrameTime;
+            currX += (targetX - startX) / speed * pass;
+            currY += (targetY - startY) / speed * pass;
+            if (currY < targetY) {
+                currX = targetX;
+                currY = targetY;
+                _this.removeEventListener(egret.Event.ENTER_FRAME, onEnterFrame, _this);
+            }
+            chip.x = currX;
+            chip.y = currY;
+        };
+        this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+    };
     MainBoard.prototype.selectChip = function (idx) {
+        app.playEffectSound("ClickSound_wav");
+        this.chipIdx = idx;
         this.chips.forEach(function (chip, index) {
             chip.setActive(idx === index);
         });
@@ -94,8 +188,17 @@ var MainBoard = (function (_super) {
         result.texture = texture;
         return result;
     };
-    MainBoard.prototype.onClickHistory = function () {
-        console.log("on click.");
+    MainBoard.prototype.showHistory = function () {
+        app.modalManager.openHistoryModal();
+    };
+    MainBoard.prototype.showDealerList = function () {
+        app.modalManager.openDealerListModal();
+    };
+    MainBoard.prototype.handleBeDealer = function () {
+        app.beDealer();
+    };
+    MainBoard.prototype.handleBePlayer = function () {
+        app.bePlayer();
     };
     return MainBoard;
 }(egret.DisplayObjectContainer));

@@ -2,6 +2,7 @@ let utils = {
     extends(target: Object, ...sources: any[]): any {
         if (arguments.length <= 1) return target;
         return sources.reduce((result, src) => {
+            if (!src) return result;
             Object.keys(src).forEach(key => {
                 result[key] = src[key];
             });
@@ -15,5 +16,53 @@ let utils = {
         } else {
             return RES.getRes(arr[0]).getTexture(arr[1]);
         }
+    },
+    cache: {
+        set(key, value) {
+            localStorage.setItem(key, value)
+        },
+        get(key) {
+            return localStorage.getItem(key)
+        },
+        remove(key) {
+            localStorage.removeItem(key)
+        },
+        clear() {
+            localStorage.clear()
+        }
+    },
+    url: {
+        params(key?: string): any {
+            let result = {};
+            let searches = location.search.replace(/^\?/, '').split('&');
+            searches.forEach(item => {
+                let arr = item.split('=');
+                if (arr[0] && arr[1]) {
+                    result[arr[0]] = decodeURIComponent(arr[1]);
+                }
+            })
+            if (key) {
+                return result[key];
+            }
+            return result;
+        },
+        paramUrl(url: string, params: Object = {}): string {
+            let searches = [];
+            Object.keys(params).forEach(key => {
+                searches.push(key + "=" + encodeURIComponent(params[key]));
+            });
+            if (searches.length) {
+                return url + "?" + searches.join("&");
+            }
+            return url;
+        }
+    },
+    randomNumber(min: number, max: number) {
+        let diff = max - min + 1;
+        let num = Math.floor(Math.random() * diff);
+        return min + num;
+    },
+    unixTimeToDate(unixTime: number): Date {
+        return new Date(unixTime * 1000);
     }
 };

@@ -76,6 +76,7 @@ var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
         var _this = _super.call(this) || this;
+        _this.bgmEnabled = true;
         app = _this;
         _this.addEventListener(egret.Event.ADDED_TO_STAGE, _this.onAddToStage, _this);
         return _this;
@@ -98,20 +99,32 @@ var Main = (function (_super) {
     };
     Main.prototype.runGame = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var userInfo;
+            var gameConfig, gameState;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, this.loadResource()];
                     case 1:
                         _a.sent();
                         this.createGameScene();
-                        return [4 /*yield*/, platform.login()];
+                        // this.showLoading();
+                        return [4 /*yield*/, this.loadSounds()];
                     case 2:
+                        // this.showLoading();
                         _a.sent();
-                        return [4 /*yield*/, platform.getUserInfo()];
+                        return [4 /*yield*/, platform.login()];
                     case 3:
-                        userInfo = _a.sent();
-                        console.log(userInfo);
+                        _a.sent();
+                        return [4 /*yield*/, platform.getGameConfig()];
+                    case 4:
+                        gameConfig = _a.sent();
+                        return [4 /*yield*/, platform.getGameState()];
+                    case 5:
+                        gameState = _a.sent();
+                        this.game.init(gameState);
+                        // this.hideLoading();
+                        platform.addEventListener(RemoteEvent.BET, this.onRemoteBet, this);
+                        platform.addEventListener(RemoteEvent.GAME_CREATE, this.onRemoteGameCreated, this);
+                        platform.addEventListener(RemoteEvent.GAME_RECEIVED_RESULT, this.onRemoteGameReceivedResult, this);
                         return [2 /*return*/];
                 }
             });
@@ -149,6 +162,43 @@ var Main = (function (_super) {
             });
         });
     };
+    Main.prototype.loadSounds = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var e_2;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, RES.loadGroup("sounds", 0)];
+                    case 1:
+                        _a.sent();
+                        this.bgMusic = RES.getRes("SoundBg_mp3");
+                        this.bgChannel = this.bgMusic.play();
+                        return [3 /*break*/, 3];
+                    case 2:
+                        e_2 = _a.sent();
+                        console.error(e_2);
+                        return [3 /*break*/, 3];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    /**
+     * 打开/关闭声音
+     */
+    Main.prototype.toggleBgmEnabled = function () {
+        this.bgmEnabled = !this.bgmEnabled;
+        if (this.bgmEnabled) {
+            this.bgChannel = this.bgMusic.play();
+        }
+        else {
+            this.bgChannel.stop();
+        }
+        var evt = new AppEvent(AppEvent.BGM_TOGGLE);
+        evt.data = this.bgmEnabled;
+        this.dispatchEvent(evt);
+    };
     /**
      * 创建游戏场景
      * Create a game scene
@@ -158,7 +208,8 @@ var Main = (function (_super) {
         this.createGameBG();
         this.mainBoard = new MainBoard();
         this.addChild(this.mainBoard);
-        this.showLoading();
+        this.game = new Game();
+        this.addChild(this.game);
         this.modalManager = new ModalManager();
         this.addChild(this.modalManager);
         this.leftControl = new LeftControl();
@@ -170,6 +221,56 @@ var Main = (function (_super) {
         bg.addChild(bgImg);
         this.addChild(bg);
     };
+    Main.prototype.playEffectSound = function (resource) {
+        if (typeof resource === "string") {
+            var sound = RES.getRes(resource);
+            this.effectChannel = sound.play(0, 1);
+        }
+        else {
+            this.effectChannel = resource.play(0, 1);
+        }
+    };
+    /**
+     * 申请上庄
+     */
+    Main.prototype.beDealer = function () {
+        // this.game.restart();
+        this.game.showGameResult();
+        // new Dialog("您的余额不足，无法上庄！");
+    };
+    /**
+     * 申请下庄
+     */
+    Main.prototype.bePlayer = function () {
+    };
+    /**
+     * 下注
+     */
+    Main.prototype.postBet = function (playerIdx, amount) {
+        // TODO 下注接口
+        if (!this.game.currentPhase)
+            return;
+        if (this.game.currentPhase.type !== PhaseType.Betting)
+            return;
+        if (this.game.no_betting_time * 1000 <= +new Date)
+            return;
+        this.mainBoard.showBetAnimation(amount, playerIdx);
+    };
+    /**
+     * 服务端下注触发
+     */
+    Main.prototype.onRemoteBet = function (e) {
+        var data = e.data;
+        this.mainBoard.showBetAnimation(data.amount, data.playerIdx);
+    };
+    Main.prototype.onRemoteGameCreated = function (e) {
+        var data = e.data;
+        this.game.createNewGame(data.game_id, data.no_betting_time, data.lottery_time);
+    };
+    Main.prototype.onRemoteGameReceivedResult = function (e) {
+        var data = e.data;
+        this.game.receivedGameStateData(data);
+    };
     Main.prototype.showLoading = function () {
         if (!this.appLoading) {
             this.appLoading = new AppLoading();
@@ -179,6 +280,27 @@ var Main = (function (_super) {
     };
     Main.prototype.hideLoading = function () {
         this.appLoading.visible = false;
+    };
+    Main.prototype.showWaitTip = function () {
+        if (!this.spWaitTip) {
+            this.spWaitTip = new egret.Sprite();
+            var tipBG = new egret.Bitmap(utils.getRes("brnn_env.loadingBG"));
+            tipBG.x = 5;
+            tipBG.y = 325;
+            this.spWaitTip.addChild(tipBG);
+            var bmTip = new egret.Bitmap(utils.getRes("brnn_env.text_time"));
+            bmTip.x = (1280 - bmTip.width) / 2;
+            bmTip.y = 325;
+            this.spWaitTip.addChild(bmTip);
+        }
+        this.addChild(this.spWaitTip);
+    };
+    Main.prototype.hideWaitTip = function () {
+        try {
+            this.removeChild(this.spWaitTip);
+        }
+        catch (e) {
+        }
     };
     return Main;
 }(egret.DisplayObjectContainer));

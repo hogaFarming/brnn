@@ -23,16 +23,16 @@ var Chip = (function (_super) {
         _this.disabled = false;
         _this.active = false;
         _this.value = value;
-        _this.touchEnabled = true;
+        // this.touchEnabled = true;
         _this.bitmaps = _this.createBitmaps();
         _this.txt = _this.createText();
         _this.render();
         return _this;
     }
     Chip.prototype.createBitmaps = function () {
-        var txtr = this.getRes(ChipValMap[this.value][0]);
+        var txtr = utils.getRes(ChipValMap[this.value][0]);
         var sheet = new egret.SpriteSheet(txtr);
-        var bmNormal = new egret.Bitmap(sheet.createTexture("normal", 10, 10, 100, 100));
+        var bmNormal = new egret.Bitmap(sheet.createTexture("normal", 10, 13, 100, 100));
         var bmActive = new egret.Bitmap(sheet.createTexture("active", 10, 135, 110, 110));
         bmNormal.fillMode = egret.BitmapFillMode.CLIP;
         bmActive.fillMode = egret.BitmapFillMode.CLIP;
@@ -72,15 +72,6 @@ var Chip = (function (_super) {
         }
         else {
             return value / 1000000 + "百万";
-        }
-    };
-    Chip.prototype.getRes = function (name) {
-        var arr = name.split('.');
-        if (arr.length === 1) {
-            return RES.getRes(name);
-        }
-        else {
-            return RES.getRes(arr[0]).getTexture(arr[1]);
         }
     };
     return Chip;

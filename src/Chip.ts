@@ -9,25 +9,25 @@ const ChipValMap = {
 
 class Chip extends egret.Sprite {
 
-    private value: number;
-    private disabled: boolean = false;
-    private active = false;
+    public value: number;
+    public disabled: boolean = false;
+    public active = false;
     private bitmaps: Array<egret.Bitmap>;
     private txt: egret.TextField;
 
     constructor(value: number) {
         super();
         this.value = value;
-        this.touchEnabled = true;
+        // this.touchEnabled = true;
         this.bitmaps = this.createBitmaps();
         this.txt = this.createText();
         this.render();
     }
 
     private createBitmaps(): Array<egret.Bitmap> {
-        let txtr: egret.Texture = this.getRes(ChipValMap[this.value][0]);
+        let txtr: egret.Texture = utils.getRes(ChipValMap[this.value][0]);
         let sheet = new egret.SpriteSheet(txtr);
-        let bmNormal = new egret.Bitmap(sheet.createTexture("normal", 10, 10, 100, 100));
+        let bmNormal = new egret.Bitmap(sheet.createTexture("normal", 10, 13, 100, 100));
         let bmActive = new egret.Bitmap(sheet.createTexture("active", 10, 135, 110, 110));
         bmNormal.fillMode = egret.BitmapFillMode.CLIP;
         bmActive.fillMode = egret.BitmapFillMode.CLIP;
@@ -70,15 +70,6 @@ class Chip extends egret.Sprite {
             return value / 10000 + "万";
         } else {
             return value / 1000000 + "百万";
-        }
-    }
-
-    private getRes(name: string): egret.Texture {
-        let arr = name.split('.');
-        if (arr.length === 1) {
-            return RES.getRes(name);
-        } else {
-            return RES.getRes(arr[0]).getTexture(arr[1]);
         }
     }
 }

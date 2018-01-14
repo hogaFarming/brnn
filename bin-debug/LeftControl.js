@@ -13,6 +13,7 @@ var LeftControl = (function (_super) {
     function LeftControl() {
         var _this = _super.call(this) || this;
         _this.initView();
+        app.addEventListener(AppEvent.BGM_TOGGLE, _this.onAppBgmToggled, _this);
         return _this;
     }
     LeftControl.prototype.initView = function () {
@@ -37,9 +38,15 @@ var LeftControl = (function (_super) {
         panel.y = 210;
         this.addChild(panel);
         this.addPanelBtn(ButtonModels.BackButton, this.onClickBackBtn, 12, 18);
-        this.addPanelBtn(ButtonModels.SoundButtonA, this.onClickBackBtn, 73, 118);
-        this.addPanelBtn(ButtonModels.SoundButtonB, this.onClickBackBtn, 73, 118);
+        this.soundBtn = this.addPanelBtn(ButtonModels.SoundButtonA, this.handleClickSoundBtn, 73, 118);
+        this.soundDisabledBtn = this.addPanelBtn(ButtonModels.SoundButtonB, this.handleClickSoundBtn, 73, 118);
         this.addPanelBtn(ButtonModels.HelpButton, this.onClickBackBtn, 12, 212);
+        if (app.bgmEnabled) {
+            this.panel.removeChild(this.soundDisabledBtn);
+        }
+        else {
+            this.panel.removeChild(this.soundBtn);
+        }
     };
     LeftControl.prototype.addPanelBtn = function (btnModel, clickHandler, x, y) {
         var factory = new ButtonFactory();
@@ -48,12 +55,27 @@ var LeftControl = (function (_super) {
         btn.y = y;
         btn.addEventListener(ButtonEvent.CLICK, clickHandler, this);
         this.panel.addChild(btn);
+        return btn;
+    };
+    LeftControl.prototype.onAppBgmToggled = function (event) {
+        if (event.data === true) {
+            this.panel.removeChild(this.soundDisabledBtn);
+            this.panel.addChild(this.soundBtn);
+        }
+        else {
+            this.panel.removeChild(this.soundBtn);
+            this.panel.addChild(this.soundDisabledBtn);
+        }
     };
     LeftControl.prototype.onClickBackBtn = function () {
         console.log("click panel btn");
         app.modalManager.openHelpModal();
     };
+    LeftControl.prototype.handleClickSoundBtn = function () {
+        app.toggleBgmEnabled();
+    };
     LeftControl.prototype.togglePanel = function () {
+        app.playEffectSound("ClickSound_wav");
         this.panel.visible = !this.panel.visible;
     };
     LeftControl.prototype.getRes = function (name) {

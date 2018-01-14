@@ -25,6 +25,7 @@ var Modal = (function (_super) {
         this.visible = false;
         var blackBG = new egret.Bitmap(utils.getRes("blackBG_png"));
         this.addChild(blackBG);
+        blackBG.touchEnabled = true;
         this.wind.x = (1280 - this.wind.width) / 2;
         this.wind.y = (720 - this.wind.height) / 2;
         this.addChild(this.wind);

@@ -13,7 +13,7 @@ class MainBoard extends egret.DisplayObjectContainer {
     private txtDealerRounds: egret.TextField; // 庄家局数
 
     private spPhaseTitle: egret.Sprite; // 当前阶段
-    private txtCount: egret.TextField; // 倒计时
+    private txtCountDown: egret.TextField; // 倒计时
 
     private chips: Array<Chip>; // 筹码
     private chipIdx: number; // 选中筹码
@@ -22,6 +22,9 @@ class MainBoard extends egret.DisplayObjectContainer {
     private btnDealerList: Button; // 上庄列表按钮
     private btnBeDealer: Button; // 申请上庄按钮;
     private btnBePlayer: Button; // 申请下庄按钮;
+
+    private spPlayerAreas: Array<egret.Sprite>; // 下筹区域
+    private betChips: Array<Chip> = []; // 已下筹码
 
     constructor() {
         super();
@@ -40,13 +43,15 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
 
-        this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.onClickHistory, 263, 610);
-        this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.onClickHistory, 955, 610);
-        this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.onClickHistory, 1120, 610);
-        this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.onClickHistory, 1120, 610);
+        this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.showHistory, 263, 610);
+        this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.showDealerList, 955, 610);
+        this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.handleBeDealer, 1120, 610);
+        this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
 
         this.chips = this.createChips();
+
+        this.spPlayerAreas = this.createPlayerAreas();
     }
 
     private createButton(btnModel: ButtonModel, clickHandler: Function, x: number, y: number): Button {
@@ -85,6 +90,7 @@ class MainBoard extends egret.DisplayObjectContainer {
             chip.y = chipY;
             result.push(chip);
             this.addChild(chip);
+            chip.touchEnabled = true;
             chip.addEventListener(egret.TouchEvent.TOUCH_TAP, (event: egret.Event) => {
                 console.log('click chip')
                 this.selectChip(index);
@@ -93,7 +99,101 @@ class MainBoard extends egret.DisplayObjectContainer {
         return result;
     }
 
+    private createPlayerAreas(): Array<egret.Sprite> {
+        let areaInfos = [
+            { resName: "brnn_env.bottomGlow_4", x: 342, y: 70 },
+            { resName: "brnn_env.bottomGlow_0", x: 0, y: 200 },
+            { resName: "brnn_env.bottomGlow_1", x: 272, y: 234 },
+            { resName: "brnn_env.bottomGlow_2", x: 612, y: 235 },
+            { resName: "brnn_env.bottomGlow_3", x: 880, y: 200 },
+        ];
+        let result = areaInfos.map((info, idx) => {
+            let sp = new egret.Sprite();
+            sp.graphics.beginFill(0x000000, 0);
+            let bitmap = new egret.Bitmap(utils.getRes(info.resName));
+            sp.graphics.drawRect(0, 0, bitmap.width, bitmap.height);
+            sp.graphics.endFill();
+            sp.addChild(bitmap);
+            sp.width = bitmap.width;
+            sp.height = bitmap.height;
+            bitmap.visible = false;
+            sp.x = info.x;
+            sp.y = info.y;
+            this.addChild(sp);
+            sp.touchEnabled = true;
+            if (idx !== 0) {
+                sp.addEventListener(egret.TouchEvent.TOUCH_TAP, (e: egret.TouchEvent) => {
+                    // console.log(e);
+                    const padding = 80;
+                    if ((e.stageX - sp.x) > padding
+                        && (e.stageX + padding) < (sp.x + sp.width)
+                        && (e.stageY - sp.y) > padding
+                        && (e.stageY + padding) < (sp.y + sp.height)) {
+                        this.handlePlayerAreaClick(idx);
+                    }
+                }, this);
+            }
+            return sp;
+        });
+        return result;
+    }
+
+    private handlePlayerAreaClick(index: number) {
+        // TODO 限制下注时间
+        if (this.chipIdx === undefined) return;
+        let amount = this.chips[this.chipIdx].value;
+        app.postBet(index, amount);
+        // this.showBetAnimation(amount, index);
+    }
+
+    public showBetAnimation(value: number, playerIdx: number) {
+        let originChip = this.chips.filter(item => item.value === value)[0];
+        if (!originChip) return;
+        
+        app.playEffectSound("SoundChouMa_wav");
+        let spArea = this.spPlayerAreas[playerIdx];
+        const padding = 120;
+        let width = spArea.width - (padding * 2);
+        let height = spArea.height - (padding * 2);
+        let targetX = spArea.x + Math.round(Math.random() * width) + padding;
+        let targetY = spArea.y + Math.round(Math.random() * height) + padding;
+        let startX = originChip.x;
+        let startY = originChip.y;
+        let currX = startX;
+        let currY = startY;
+        let lastFrameTime = egret.getTimer();
+        let speed = 200;
+
+        let chip = new Chip(value);
+        chip.x = currX;
+        chip.y = currY;
+        chip.scaleX = 0.65;
+        chip.scaleY = 0.65;
+        chip.anchorOffsetX = 50;
+        chip.anchorOffsetY = 50;
+        this.addChild(chip);
+        this.betChips.push(chip);
+
+        let onEnterFrame = () => {
+            let now = egret.getTimer();
+            let pass = now - lastFrameTime;
+            currX += (targetX - startX) / speed * pass;
+            currY += (targetY - startY) / speed * pass;
+            if (currY < targetY) {
+                currX = targetX;
+                currY = targetY;
+                this.removeEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+            }
+            chip.x = currX;
+            chip.y = currY;
+        }
+
+        this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+    }
+
     private selectChip(idx: number): void {
+        app.playEffectSound("ClickSound_wav");
+        this.chipIdx = idx;
         this.chips.forEach((chip, index) => {
             chip.setActive(idx === index);
         });
@@ -114,7 +214,19 @@ class MainBoard extends egret.DisplayObjectContainer {
         return result;
     }
 
-    private onClickHistory(): void {
-        console.log("on click.");
+    private showHistory(): void {
+        app.modalManager.openHistoryModal();
+    }
+
+    private showDealerList(): void {
+        app.modalManager.openDealerListModal();
+    }
+
+    private handleBeDealer(): void {
+        app.beDealer();
+    }
+
+    private handleBePlayer(): void {
+        app.bePlayer();
     }
 }

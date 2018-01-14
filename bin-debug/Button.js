@@ -35,6 +35,7 @@ var Button = (function (_super) {
         this.addEventListener(egret.TouchEvent.TOUCH_TAP, this.onTouchTap, this);
     };
     Button.prototype.onTouchTap = function (event) {
+        app.playEffectSound("ClickSound_wav");
         var clickEvt = new ButtonEvent(ButtonEvent.CLICK);
         this.dispatchEvent(clickEvt);
     };

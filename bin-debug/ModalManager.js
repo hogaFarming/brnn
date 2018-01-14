@@ -18,10 +18,22 @@ var ModalManager = (function (_super) {
     ModalManager.prototype.createModals = function () {
         this.helpModal = new Modal(new HelpWindow());
         this.addChild(this.helpModal);
+        this.historyModal = new Modal(new HistoryWindow());
+        this.addChild(this.historyModal);
+        this.dealerListModal = new Modal(new DealerListWindow());
+        this.addChild(this.dealerListModal);
     };
     ModalManager.prototype.openHelpModal = function () {
         console.log("open help modal");
         this.helpModal.open();
+    };
+    ModalManager.prototype.openHistoryModal = function () {
+        console.log("open historyModal");
+        this.historyModal.open();
+    };
+    ModalManager.prototype.openDealerListModal = function () {
+        console.log("open historyModal");
+        this.dealerListModal.open();
     };
     return ModalManager;
 }(egret.Sprite));

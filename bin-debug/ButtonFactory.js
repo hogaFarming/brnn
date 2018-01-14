@@ -28,25 +28,25 @@ var ButtonModels = {
     },
     BackButton: {
         resName: "brnn_env.backBtn",
-        normal: { x: 0, y: 0, h: 80 },
+        normal: { x: 0, y: 2, h: 80 },
         hover: { x: 0, y: 81, h: 80 },
         pressed: { x: 0, y: 162, h: 80 }
     },
     SoundButtonA: {
         resName: "brnn_env.soundBtnA",
-        normal: { x: 0, y: 0, h: 80 },
+        normal: { x: 0, y: 2, h: 80 },
         hover: { x: 0, y: 81, h: 80 },
         pressed: { x: 0, y: 162, h: 80 }
     },
     SoundButtonB: {
         resName: "brnn_env.soundBtnB",
-        normal: { x: 0, y: 0, h: 80 },
+        normal: { x: 0, y: 2, h: 80 },
         hover: { x: 0, y: 81, h: 80 },
         pressed: { x: 0, y: 162, h: 80 }
     },
     HelpButton: {
         resName: "brnn_env.helpBtn",
-        normal: { x: 0, y: 0, h: 80 },
+        normal: { x: 0, y: 2, h: 80 },
         hover: { x: 0, y: 81, h: 80 },
         pressed: { x: 0, y: 162, h: 80 }
     },
@@ -55,6 +55,36 @@ var ButtonModels = {
         normal: { x: 0, y: 4, h: 57 },
         hover: { x: 0, y: 61, h: 61 },
         pressed: { x: 0, y: 129, h: 52 }
+    },
+    HistoryPrevBtn: {
+        resName: "brnn_cards.historyBtn1",
+        normal: { x: 0, y: 0, h: 108 },
+        hover: { x: 0, y: 113, h: 114 },
+        pressed: { x: 0, y: 235, h: 102 }
+    },
+    HistoryPrevDisabledBtn: {
+        resName: "brnn_cards.historyBtn2",
+        normal: { x: 0, y: 0, h: 108 },
+        hover: { x: 0, y: 113, h: 114 },
+        pressed: { x: 0, y: 235, h: 102 }
+    },
+    HistoryNextBtn: {
+        resName: "brnn_cards.historyBtn1",
+        normal: { x: 0, y: 0, h: 108 },
+        hover: { x: 0, y: 113, h: 114 },
+        pressed: { x: 0, y: 235, h: 102 }
+    },
+    HistoryNextDisabledBtn: {
+        resName: "brnn_cards.historyBtn2",
+        normal: { x: 0, y: 0, h: 108 },
+        hover: { x: 0, y: 113, h: 114 },
+        pressed: { x: 0, y: 235, h: 102 }
+    },
+    ConfirmBtn: {
+        resName: "brnn_env.but_determine",
+        normal: { x: 0, y: 1, h: 50 },
+        hover: { x: 0, y: 54, h: 52 },
+        pressed: { x: 0, y: 110, h: 50 }
     }
 };
 var globalButtonFactory = null;

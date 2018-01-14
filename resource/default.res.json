@@ -5,7 +5,7 @@
 			"name": "loading"
 		},
 		{
-			"keys": "blackBG_png,help3_png,brnn_ani,brnn_cards,BG_png,brnn_env",
+			"keys": "blackBG_png,help3_png,brnn_cards,BG_png,brnn_env,brnn_ani",
 			"name": "ui"
 		},
 		{
@@ -44,12 +44,6 @@
 			"type": "sheet",
 			"name": "loading_light_json",
 			"subkeys": "tx01.png,tx02.png,tx03.png,tx04.png,tx05.png,tx06.png,tx07.png,tx08.png,tx09.png,tx10.png"
-		},
-		{
-			"url": "assets/brnn_ani.json",
-			"type": "sheet",
-			"name": "brnn_ani",
-			"subkeys": "lookCards_01.png,lookCards_02.png,lookCards_03.png,lookCards_04.png,lookCards_05.png,lookCards_06.png,lookCards_07.png,lookCards_08.png,lookCards_09.png,lookCards_10.png,lookCards_11.png,lookCards_12.png,lookCards_13.png,lookCards_14.png,lookCards_15.png,lookCards_16.png,lookCards_17.png,lookCards_18.png,lookCards_19.png,lookCards_20.png,lookCards_21.png"
 		},
 		{
 			"url": "sounds/ClickSound.wav",
@@ -160,7 +154,7 @@
 			"url": "assets/brnn_cards.json",
 			"type": "sheet",
 			"name": "brnn_cards",
-			"subkeys": "Calf0_01.png,Calf0_02.png,Calf0_03.png,Calf0_04.png,Calf0_05.png,Calf0_06.png,Calf0_07.png,Calf0_08.png,Calf0_09.png,Calf0_10.png,Calf1_01.png,Calf1_02.png,Calf1_03.png,Calf1_04.png,Calf1_05.png,Calf1_06.png,Calf1_07.png,Calf1_08.png,Calf1_09.png,Calf1_10.png,Calf1_11.png,RightAndWrong1.png,RightAndWrong2.png,RightAndWrong3.png,RightAndWrong4.png,card0_01.png,card0_02.png,card1_01.png,card1_02.png,card1_03.png,card1_04.png,card1_05.png,card1_06.png,card1_07.png,card1_08.png,card1_09.png,card1_10.png,card1_11.png,card1_12.png,card1_13.png,card2_01.png,card2_02.png,card2_03.png,card2_04.png,card2_05.png,card2_06.png,card2_07.png,card2_08.png,card2_09.png,card2_10.png,card2_11.png,card2_12.png,card2_13.png,card3_01.png,card3_02.png,card3_03.png,card3_04.png,card3_05.png,card3_06.png,card3_07.png,card3_08.png,card3_09.png,card3_10.png,card3_11.png,card3_12.png,card3_13.png,card4_01.png,card5_01.png,card6_01.png,card6_02.png,card6_03.png,card6_04.png,card6_05.png,card6_06.png,card6_07.png,card6_08.png,card6_09.png,card6_10.png,card6_11.png,card6_12.png,card6_13.png,card6_14.png,card6_15.png,card6_16.png,card6_17.png,card6_18.png,card6_19.png,card6_20.png,card6_21.png,card6_22.png,card6_23.png,card6_24.png,card6_25.png,card6_26.png,card6_27.png,card6_28.png,card6_29.png,card6_30.png,card6_31.png,card6_32.png,card6_33.png,card6_34.png,card6_35.png,card6_36.png,card6_37.png,card6_38.png,card6_39.png,card6_40.png,card6_41.png,card6_42.png,card6_43.png,card6_44.png,card6_45.png,card6_46.png,card6_47.png,card6_48.png,card6_49.png,card6_50.png,card6_51.png,card6_52.png,card6_53.png,card6_54.png,chip_ash.png,ctrlStatus.png,fullBtnA.png,fullBtnB.png,help_btn1_0.png,help_btn1_1.png,help_btn1_2.png,help_btn2_0.png,help_btn2_1.png,help_btn2_2.png,historyBtn1.png,historyBtn2.png,littleChip_0.png,littleChip_1.png,littleChip_2.png,littleChip_3.png,littleChip_4.png,littleChip_5.png,newRecord.png,quit.png,scrollBar_bg.png,scrollBar_line.png"
+			"subkeys": "Calf0_01,Calf0_02,Calf0_03,Calf0_04,Calf0_05,Calf0_06,Calf0_07,Calf0_08,Calf0_09,Calf0_10,Calf1_01,Calf1_02,Calf1_03,Calf1_04,Calf1_05,Calf1_06,Calf1_07,Calf1_08,Calf1_09,Calf1_10,Calf1_11,RightAndWrong1,RightAndWrong2,RightAndWrong3,RightAndWrong4,card0_01,card0_02,card1_01,card1_02,card1_03,card1_04,card1_05,card1_06,card1_07,card1_08,card1_09,card1_10,card1_11,card1_12,card1_13,card2_01,card2_02,card2_03,card2_04,card2_05,card2_06,card2_07,card2_08,card2_09,card2_10,card2_11,card2_12,card2_13,card3_01,card3_02,card3_03,card3_04,card3_05,card3_06,card3_07,card3_08,card3_09,card3_10,card3_11,card3_12,card3_13,card4_01,card5_01,card6_01,card6_02,card6_03,card6_04,card6_05,card6_06,card6_07,card6_08,card6_09,card6_10,card6_11,card6_12,card6_13,card6_14,card6_15,card6_16,card6_17,card6_18,card6_19,card6_20,card6_21,card6_22,card6_23,card6_24,card6_25,card6_26,card6_27,card6_28,card6_29,card6_30,card6_31,card6_32,card6_33,card6_34,card6_35,card6_36,card6_37,card6_38,card6_39,card6_40,card6_41,card6_42,card6_43,card6_44,card6_45,card6_46,card6_47,card6_48,card6_49,card6_50,card6_51,card6_52,card6_53,card6_54,chip_ash,ctrlStatus,fullBtnA,fullBtnB,help_btn1_0,help_btn1_1,help_btn1_2,help_btn2_0,help_btn2_1,help_btn2_2,historyBtn1,historyBtn2,littleChip_0,littleChip_1,littleChip_2,littleChip_3,littleChip_4,littleChip_5,newRecord,quit,scrollBar_bg,scrollBar_line"
 		},
 		{
 			"url": "assets/brnn_env.json",
@@ -172,6 +166,12 @@
 			"url": "assets/BG.png",
 			"type": "image",
 			"name": "BG_png"
+		},
+		{
+			"url": "assets/brnn_ani.json",
+			"type": "sheet",
+			"name": "brnn_ani",
+			"subkeys": "lookCards_01,lookCards_02,lookCards_03,lookCards_04,lookCards_05,lookCards_06,lookCards_07,lookCards_08,lookCards_09,lookCards_10,lookCards_11,lookCards_12,lookCards_13,lookCards_14,lookCards_15,lookCards_16,lookCards_17,lookCards_18,lookCards_19,lookCards_20,lookCards_21"
 		}
 	]
 }

@@ -3,13 +3,14 @@ class LeftControl extends egret.Sprite {
     private toggle: egret.Sprite;
     private panel: egret.Sprite;
     private backBtn: Button;
-    private soundBtnA: Button;
-    private soundBtnB: Button;
+    private soundBtn: Button;
+    private soundDisabledBtn: Button;
     private helpBtn: Button;
 
     constructor() {
         super();
         this.initView();
+        app.addEventListener(AppEvent.BGM_TOGGLE, this.onAppBgmToggled, this);
     }
 
     private initView(): void {
@@ -36,18 +37,34 @@ class LeftControl extends egret.Sprite {
         panel.y = 210;
         this.addChild(panel);
         this.addPanelBtn(ButtonModels.BackButton, this.onClickBackBtn, 12, 18);
-        this.addPanelBtn(ButtonModels.SoundButtonA, this.onClickBackBtn, 73, 118);
-        this.addPanelBtn(ButtonModels.SoundButtonB, this.onClickBackBtn, 73, 118);
+        this.soundBtn = this.addPanelBtn(ButtonModels.SoundButtonA, this.handleClickSoundBtn, 73, 118);
+        this.soundDisabledBtn = this.addPanelBtn(ButtonModels.SoundButtonB, this.handleClickSoundBtn, 73, 118);
         this.addPanelBtn(ButtonModels.HelpButton, this.onClickBackBtn, 12, 212);
+        if (app.bgmEnabled) {
+            this.panel.removeChild(this.soundDisabledBtn);
+        } else {
+            this.panel.removeChild(this.soundBtn);
+        }
     }
 
-    private addPanelBtn(btnModel: ButtonModel, clickHandler: Function, x: number, y: number): void {
+    private addPanelBtn(btnModel: ButtonModel, clickHandler: Function, x: number, y: number): Button {
         let factory = new ButtonFactory();
         let btn = factory.createButton(btnModel);
         btn.x = x;
         btn.y = y;
         btn.addEventListener(ButtonEvent.CLICK, clickHandler, this);
         this.panel.addChild(btn);
+        return btn;
+    }
+
+    private onAppBgmToggled(event: AppEvent): void {
+        if (event.data === true) {
+            this.panel.removeChild(this.soundDisabledBtn);
+            this.panel.addChild(this.soundBtn);
+        } else {
+            this.panel.removeChild(this.soundBtn);
+            this.panel.addChild(this.soundDisabledBtn);
+        }
     }
 
     private onClickBackBtn(): void {
@@ -55,7 +72,12 @@ class LeftControl extends egret.Sprite {
         app.modalManager.openHelpModal();
     }
 
+    private handleClickSoundBtn(): void {
+        app.toggleBgmEnabled();
+    }
+
     public togglePanel(): void {
+        app.playEffectSound("ClickSound_wav");
         this.panel.visible = !this.panel.visible;
     }
 
