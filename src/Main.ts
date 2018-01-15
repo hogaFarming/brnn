@@ -29,6 +29,15 @@
 
 let app: Main = null;
 
+egret.lifecycle.onPause = ()=> {
+    console.log("app 进入后台");
+    egret.ticker.pause(); // 关闭渲染与心跳
+}
+egret.lifecycle.onResume = ()=> {
+    console.log("app 进入前台");
+    egret.ticker.resume(); // 打开渲染与心跳
+}
+
 class Main extends egret.DisplayObjectContainer {
     public mainBoard: MainBoard;
     public game: Game;
@@ -77,7 +86,7 @@ class Main extends egret.DisplayObjectContainer {
         await platform.login();
         let gameConfig = await platform.getGameConfig();
         let gameState: GameStateData = await platform.getGameState();
-        this.game.init(gameState);
+        this.game.init(gameState, gameConfig);
         // this.hideLoading();
 
         platform.addEventListener(RemoteEvent.BET, this.onRemoteBet, this);
@@ -165,9 +174,7 @@ class Main extends egret.DisplayObjectContainer {
      * 申请上庄
      */
     public beDealer() {
-        // this.game.restart();
-        this.game.showGameResult();
-        // new Dialog("您的余额不足，无法上庄！");
+        new Dialog("您的余额不足，无法上庄！");
     }
 
     /**
@@ -185,7 +192,7 @@ class Main extends egret.DisplayObjectContainer {
         if (!this.game.currentPhase) return;
         if (this.game.currentPhase.type !== PhaseType.Betting) return;
         if (this.game.no_betting_time * 1000 <= +new Date) return;
-        this.mainBoard.showBetAnimation(amount, playerIdx);
+        platform.bet(this.game.gameId, amount, playerIdx);
     }
 
     /**
@@ -197,8 +204,13 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     public onRemoteGameCreated(e: RemoteEvent) {
-        let data = e.data;
-        this.game.createNewGame(data.game_id, data.no_betting_time, data.lottery_time);
+        this.game.nextNewGame = e.data;
+        // if (this.game.currentPhase && this.game.currentPhase.type === PhaseType.Lottery && this.game.currentPhase.countDown > 0) {
+        //     this.game.nextNewGame = e.data;
+        // } else {
+        //     let data = e.data;
+        //     this.game.createNewGame(data.game_id, data.no_betting_time, data.lottery_time);
+        // }
     }
 
     public onRemoteGameReceivedResult(e: RemoteEvent) {

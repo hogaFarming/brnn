@@ -23,56 +23,84 @@ var Game = (function (_super) {
     __extends(Game, _super);
     function Game() {
         var _this = _super.call(this) || this;
+        _this.coin_num = 0; // 余额
         _this.startIndex = 0; // 从哪个玩家开始发牌
         _this.currIndex = 0; // 当前发到第几张
         _this.spPlayerResults = []; // 翻牌结果
         return _this;
     }
-    Game.prototype.init = function (stateData) {
-        this.gameStateData = stateData;
+    Game.prototype.init = function (stateData, gameConfig) {
+        this.setGameStateData(stateData);
         this.gameId = stateData.id;
+        if (gameConfig) {
+            this.coin_num = gameConfig.coin_num;
+            app.mainBoard.setMoney(gameConfig.coin_num);
+        }
         if (stateData.status === 0) {
             if (stateData.no_betting_time * 1000 < +new Date) {
                 app.showWaitTip();
             }
             this.initCurrentPhase();
         }
-        else if (stateData.status === 1) {
-            this.startLottery();
-        }
-        else if (stateData.status === 2) {
-            // 显示牌面，并显示结算结果
-            this.initCardPackage();
-            this.initCurrentPhase();
-            this.startDispatchCardsImmediately();
+        else {
+            this.nextNewGame = stateData.next_game_info;
+            if (stateData.status === 1) {
+                var secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
+                this.startLottery(secondsForLottery);
+            }
+            else if (stateData.status === 2) {
+                // 显示牌面，并显示结算结果
+                this.initCardPackage();
+                this.initCurrentPhase();
+                this.startDispatchCardsImmediately();
+            }
         }
     };
     /**
-     * 获取到了牌面结果?
+     * 投注过程或开奖过程中，获取到了牌面/结算结果
      */
     Game.prototype.receivedGameStateData = function (stateData) {
-        this.gameStateData = stateData;
-        if (this.currentPhase.countDown === 0) {
-            this.startLottery();
+        // console.log("this.currentPhase.type === PhaseType.Betting && this.currentPhase.countDown <= 0 => " + (this.currentPhase.type === PhaseType.Betting && this.currentPhase.countDown <= 0));
+        // console.log("this.currentPhase.type === PhaseType.Lottery => " + (this.currentPhase.type === PhaseType.Lottery));
+        if (this.currentPhase.type === PhaseType.Betting) {
+            this.setGameStateData(stateData);
+            if (this.currentPhase.countDown <= 0) {
+                var lottery_time = this.nextNewGame ? this.nextNewGame.lottery_time : (stateData.lottery_time + 50);
+                var secondsForLottery = Math.ceil(lottery_time - 20 - (+new Date / 1000));
+                if (secondsForLottery < 0)
+                    secondsForLottery += 51;
+                this.startLottery(secondsForLottery);
+            }
+        }
+        else if (this.currentPhase.type === PhaseType.Lottery) {
+            this.setGameStateData(stateData);
+            if (stateData.status === 2 && this.currentPhase.countDown === 0) {
+                this.showGameResult();
+            }
         }
     };
     Game.prototype.createNewGame = function (gameId, no_betting_time, lottery_time) {
+        console.log("create new game: " + gameId + ", no_betting_time: " + new Date(no_betting_time * 1000) + ", lottery_time: " + new Date(lottery_time * 1000));
+        this.setGameStateData(null);
         this.gameId = gameId;
         this.clear();
+        app.mainBoard.clearBetChips();
         var now = Math.floor(+new Date / 1000);
         var secondsToLottery = lottery_time - now;
         this.no_betting_time = no_betting_time;
+        console.log("countdown seconds: " + secondsToLottery);
         this.setCurrentPhase({
             type: PhaseType.Betting,
             countDown: secondsToLottery
         });
     };
-    Game.prototype.startLottery = function () {
+    Game.prototype.startLottery = function (countDown) {
         if (this.currentPhase.type === PhaseType.Lottery)
             return;
+        console.log("开奖，countdown" + countDown);
         this.setCurrentPhase({
             type: PhaseType.Lottery,
-            countDown: 25
+            countDown: countDown || 25
         });
         this.initCardPackage();
         this.dispatchDecisionCard();
@@ -82,7 +110,11 @@ var Game = (function (_super) {
     };
     Game.prototype.startDispatchCards = function () {
         console.log("开始发牌..");
-        this.removeChildAt(0);
+        try {
+            this.removeChild(this.decisionCard);
+        }
+        catch (e) { }
+        ;
         var timer = new egret.Timer(Game.DispatchInterval, 24);
         timer.addEventListener(egret.TimerEvent.TIMER, this.dispatchNextCard, this);
         timer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.onDispatchCardsComplete, this);
@@ -121,40 +153,70 @@ var Game = (function (_super) {
                 countDown: secondsToLottery
             });
         }
-        else if (this.gameStateData.status === 1) {
+        else {
+            var secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
             this.setCurrentPhase({
                 type: PhaseType.Lottery,
-                countDown: 25
+                countDown: secondsForLottery
             });
+            // if (this.gameStateData.status === 1) {
+            //     this.setCurrentPhase({
+            //         type: PhaseType.Lottery,
+            //         countDown: secondsForLottery
+            //     })
+            // } else if (this.gameStateData.status === 2) {
+            //     this.setCurrentPhase({
+            //         type: PhaseType.Lottery,
+            //         countDown: secondsForLottery
+            //     })
+            // }
         }
-        else if (this.gameStateData.status === 2) {
-            this.setCurrentPhase({
-                type: PhaseType.Lottery,
-                countDown: 0
-            });
+    };
+    Game.prototype.setGameStateData = function (stateData) {
+        if (stateData === null) {
+            console.log("set game state " + stateData);
+            this.gameStateData = null;
+        }
+        else {
+            console.log("set game state status:" + stateData.status);
+            this.gameStateData = stateData;
+            if (stateData.banker_type !== undefined) {
+                app.mainBoard.setDealerType(stateData.banker_type === 0 ? "系统上庄" : "玩家上庄");
+            }
         }
     };
     Game.prototype.setCurrentPhase = function (phase) {
         this.currentPhase = phase;
         if (this.currentPhase.countDown < 0)
             this.currentPhase.countDown = 0;
-        if (phase.countDown) {
-            var timer = this.timer = new egret.Timer(1000, phase.countDown);
+        if (this.currentPhase.countDown) {
+            var timer = this.timer = new egret.Timer(1000, this.currentPhase.countDown);
             timer.addEventListener(egret.TimerEvent.TIMER, this.onCountDown, this);
+            timer.start();
         }
         this.onCountDown();
     };
     Game.prototype.onCountDown = function () {
+        console.log("count down " + this.currentPhase.countDown);
         if (this.currentPhase.countDown > 0) {
             this.currentPhase.countDown -= 1;
         }
         else {
             this.currentPhase.countDown = 0;
-            if (this.gameStateData && this.gameStateData.status > 0) {
-                this.startLottery();
+            if (this.currentPhase.type === PhaseType.Betting && this.gameStateData && this.gameStateData.status > 0) {
+                // let lottery_time = this.nextNewGame ? this.nextNewGame.lottery_time : (this.gameStateData.lottery_time + 50);
+                // if (!this.nextNewGame) {
+                //     console.log("no next new game")
+                // }
+                var secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
+                // if (secondsForLottery < 0) debugger;
+                this.startLottery(secondsForLottery);
             }
-            else {
-                platform.getGameResult(this.gameId);
+            else if (this.currentPhase.type === PhaseType.Lottery) {
+                // if (this.nextNewGame) {
+                this.createNewGame(this.nextNewGame.game_id, this.nextNewGame.no_betting_time, this.nextNewGame.lottery_time);
+                // }
+                // platform.getGameResult(this.gameId);
             }
         }
         if (!this.txtPhase) {
@@ -181,8 +243,8 @@ var Game = (function (_super) {
         }
         this.txtPhase.text = PhaseTitle[this.currentPhase.type];
         this.txtCountDown.text = this.currentPhase.countDown + "";
-        this.addChild(this.txtPhase);
-        this.addChild(this.txtCountDown);
+        this.addChildAt(this.txtPhase, 0);
+        this.addChildAt(this.txtCountDown, 0);
     };
     // 初始化卡包
     Game.prototype.initCardPackage = function () {
@@ -345,6 +407,8 @@ var Game = (function (_super) {
         return RES.getRes(msgMap[msg]);
     };
     Game.prototype.showGameResult = function () {
+        if (this.gameStateData.status !== 2)
+            return;
         if (!this.spGameResult) {
             var spGameResult = this.spGameResult = new egret.Sprite();
             var mask = new egret.Bitmap(utils.getRes("blackBG_png"));
@@ -373,7 +437,17 @@ var Game = (function (_super) {
         }
         this.addChild(this.spGameResult);
         this.spResultContainer.removeChildren();
+        this.spResultContainer.addChild(this.createGameResultItem(0));
+        this.spResultContainer.addChild(this.createGameResultItem(1));
         this.spResultContainer.addChild(this.createGameResultItem(2));
+        this.spResultContainer.addChild(this.createGameResultItem(3));
+        this.spResultContainer.addChild(this.createGameResultItem(4));
+        var txtFinnalBetting = new egret.TextField();
+        txtFinnalBetting.size = 24;
+        txtFinnalBetting.x = 200;
+        txtFinnalBetting.y = 280;
+        txtFinnalBetting.text = this.gameStateData.finnal_betting_num + "";
+        this.spResultContainer.addChild(txtFinnalBetting);
     };
     Game.prototype.createGameResultItem = function (playerIdx) {
         var sp = new egret.Sprite();
@@ -382,8 +456,10 @@ var Game = (function (_super) {
         var isWin = winResults[playerIdx] === 1;
         var cardResults = [stateData.game_detail_banker, stateData.game_result_a, stateData.game_result_b, stateData.game_result_c, stateData.game_result_d];
         var resultMsg = cardResults[playerIdx].result_msg;
-        var resultMultiples = [stateData.multiple_banker, stateData.multiple_a, stateData.multiple_b, stateData.multiple_c, stateData.multiple_d];
-        var multiple = resultMultiples[playerIdx];
+        // let resultMultiples = [stateData.multiple_banker, stateData.multiple_a, stateData.multiple_b, stateData.multiple_c, stateData.multiple_d];
+        // let multiple = resultMultiples[playerIdx];
+        var resultBetting = [0, stateData.betting_a, stateData.betting_b, stateData.betting_c, stateData.betting_d];
+        var bettingNum = resultBetting[playerIdx];
         if (playerIdx === 0) {
             var resName = "brnn_env.win_1";
             var bm = new egret.Bitmap(utils.getRes(resName));
@@ -394,23 +470,20 @@ var Game = (function (_super) {
             if (isWin)
                 sp.addChild(bm);
             var bmLabel = this.getResultLabelBitmapByMsg(resultMsg);
+            sp.addChild(bmLabel);
             bmLabel.x = 450;
             bmLabel.y = 10;
             var txt = new egret.TextField();
             txt.text = stateData.banker_type === 0 ? "系统上庄" : "玩家上庄";
             txt.textColor = 0xffffff;
-            txt.size = 16;
-            txt.textAlign = "center";
-            txt.width = sp.width;
+            txt.size = 24;
             txt.x = 260;
             txt.y = 24;
             sp.addChild(txt);
             var txt1 = new egret.TextField();
-            txt1.text = multiple + "";
+            txt1.text = bettingNum + "";
             txt1.textColor = 0xffffff;
-            txt1.size = 16;
-            txt1.textAlign = "center";
-            txt1.width = sp.width;
+            txt1.size = 20;
             txt1.x = 296;
             txt1.y = 64;
             sp.addChild(txt1);
@@ -429,9 +502,9 @@ var Game = (function (_super) {
             bmLabel.x = 28;
             bmLabel.y = 38;
             var txt = new egret.TextField();
-            txt.text = multiple + "";
+            txt.text = bettingNum + "";
             txt.textColor = 0xffffff;
-            txt.size = 16;
+            txt.size = 20;
             txt.textAlign = "center";
             txt.width = sp.width;
             txt.x = 0;
@@ -450,7 +523,6 @@ var Game = (function (_super) {
     Game.prototype.clear = function () {
         app.hideWaitTip();
         this.removeChildren();
-        this.gameStateData = null;
     };
     Game.TimeAfterDecision = 1000; // 抽牌后多久开始发牌
     Game.DispatchInterval = 100; // 发牌时间间隔（速度）

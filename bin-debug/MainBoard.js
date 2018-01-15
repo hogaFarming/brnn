@@ -16,15 +16,39 @@ var MainBoard = (function (_super) {
     function MainBoard() {
         var _this = _super.call(this) || this;
         _this.betChips = []; // 已下筹码
+        _this.txtCurrBettings = []; // 显示四个位置下注金额
+        _this.currBettings = [0, 0, 0, 0]; // 当前下注
         _this.addSprites();
         return _this;
     }
+    MainBoard.prototype.setMoney = function (money) {
+        this.txtMoney.text = money + "";
+    };
+    MainBoard.prototype.setScore = function (num) {
+        this.txtScore.text = num + "";
+    };
+    MainBoard.prototype.setBetting = function (num) {
+        this.txtBetting.text = num + "";
+    };
+    MainBoard.prototype.setDealerMoney = function (money) {
+        this.txtDealerMoney.text = money + "";
+    };
+    MainBoard.prototype.setDealerScore = function (num) {
+        this.txtDealerScore.text = num + "";
+    };
+    MainBoard.prototype.setDealerRounds = function (num) {
+        this.txtDealerRounds.text = num + "";
+    };
+    MainBoard.prototype.setDealerType = function (dealerType) {
+        this.txtDealerType.text = dealerType;
+    };
     MainBoard.prototype.addSprites = function () {
         this.addBitmap("brnn_env.DealerInformation", 21, 28);
         this.addBitmap("brnn_env.timeBg", (1280 - 225) / 2, 7);
         this.txtMoney = this.createInfoText("0", 98, 605);
         this.txtScore = this.createInfoText("0", 98, 641);
         this.txtBetting = this.createInfoText("0", 98, 677);
+        this.txtDealerType = this.createInfoText("", 120, 39);
         this.txtDealerMoney = this.createInfoText("0", 120, 75);
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
@@ -167,6 +191,38 @@ var MainBoard = (function (_super) {
             chip.y = currY;
         };
         this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+        this.currBettings[playerIdx - 1] = this.currBettings[playerIdx - 1] + value;
+        var txtBettingPos = [
+            { x: 135, y: 250 },
+            { x: 380, y: 285 },
+            { x: 673, y: 280 },
+            { x: 940, y: 246 }
+        ];
+        this.txtCurrBettings.forEach(function (item) {
+            try {
+                _this.removeChild(item);
+            }
+            catch (e) { }
+        });
+        this.txtCurrBettings = [];
+        txtBettingPos.forEach(function (pos, index) {
+            var betValue = _this.currBettings[index];
+            if (!betValue)
+                return;
+            var txt = new egret.TextField();
+            txt.text = "已下注： " + betValue;
+            txt.textColor = 0xc9b667;
+            txt.x = pos.x;
+            txt.y = pos.y;
+            txt.size = 20;
+            _this.txtCurrBettings.push(txt);
+            _this.addChild(txt);
+        });
+        var totalBettings = 0;
+        this.currBettings.forEach(function (num) {
+            totalBettings += num;
+        });
+        this.setMoney(app.game.coin_num - totalBettings);
     };
     MainBoard.prototype.selectChip = function (idx) {
         app.playEffectSound("ClickSound_wav");
@@ -187,6 +243,22 @@ var MainBoard = (function (_super) {
         var texture = utils.getRes(name);
         result.texture = texture;
         return result;
+    };
+    MainBoard.prototype.clearBetChips = function () {
+        var _this = this;
+        try {
+            this.betChips.forEach(function (item) {
+                _this.removeChild(item);
+            });
+            this.betChips = [];
+            this.txtCurrBettings.forEach(function (item) {
+                _this.removeChild(item);
+            });
+            this.txtCurrBettings = [];
+            this.currBettings = [0, 0, 0, 0];
+        }
+        catch (e) {
+        }
     };
     MainBoard.prototype.showHistory = function () {
         app.modalManager.openHistoryModal();

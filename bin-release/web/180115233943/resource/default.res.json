@@ -1,0 +1,177 @@
+{
+	"groups": [
+		{
+			"keys": "loading_bg_png,loading_light_json,loading_middle_png,loading_icon_box_png",
+			"name": "loading"
+		},
+		{
+			"keys": "blackBG_png,help3_png,brnn_cards,BG_png,brnn_env,brnn_ani",
+			"name": "ui"
+		},
+		{
+			"keys": "SoundWarning_wav,SoundSendCard_wav,SoundGameOver_wav,SoundChouMa_wav,SoundChip_wav,SoundBtnOver_wav,SoundBg_mp3,SoundBeginKaiPai_wav,SoundBeginGame_wav,SoundB9_wav,SoundB8_wav,SoundB7_wav,SoundB6_wav,SoundB5_wav,SoundB4_wav,SoundB3_wav,SoundB2_wav,SoundB10_wav,SoundB1_wav,SoundB0_wav,ClickSound_wav",
+			"name": "sounds"
+		}
+	],
+	"resources": [
+		{
+			"url": "assets/loading_bg.png",
+			"type": "image",
+			"name": "loading_bg_png"
+		},
+		{
+			"url": "assets/loading_icon_box.png",
+			"type": "image",
+			"name": "loading_icon_box_png"
+		},
+		{
+			"url": "assets/loading_middle.png",
+			"type": "image",
+			"name": "loading_middle_png"
+		},
+		{
+			"url": "assets/blackBG.png",
+			"type": "image",
+			"name": "blackBG_png"
+		},
+		{
+			"url": "assets/help3.png",
+			"type": "image",
+			"name": "help3_png"
+		},
+		{
+			"url": "assets/loading_light.json",
+			"type": "sheet",
+			"name": "loading_light_json",
+			"subkeys": "tx01.png,tx02.png,tx03.png,tx04.png,tx05.png,tx06.png,tx07.png,tx08.png,tx09.png,tx10.png"
+		},
+		{
+			"url": "sounds/ClickSound.wav",
+			"type": "sound",
+			"name": "ClickSound_wav"
+		},
+		{
+			"url": "sounds/SoundB0.wav",
+			"type": "sound",
+			"name": "SoundB0_wav"
+		},
+		{
+			"url": "sounds/SoundB1.wav",
+			"type": "sound",
+			"name": "SoundB1_wav"
+		},
+		{
+			"url": "sounds/SoundB10.wav",
+			"type": "sound",
+			"name": "SoundB10_wav"
+		},
+		{
+			"url": "sounds/SoundB2.wav",
+			"type": "sound",
+			"name": "SoundB2_wav"
+		},
+		{
+			"url": "sounds/SoundB3.wav",
+			"type": "sound",
+			"name": "SoundB3_wav"
+		},
+		{
+			"url": "sounds/SoundB4.wav",
+			"type": "sound",
+			"name": "SoundB4_wav"
+		},
+		{
+			"url": "sounds/SoundB5.wav",
+			"type": "sound",
+			"name": "SoundB5_wav"
+		},
+		{
+			"url": "sounds/SoundB6.wav",
+			"type": "sound",
+			"name": "SoundB6_wav"
+		},
+		{
+			"url": "sounds/SoundB7.wav",
+			"type": "sound",
+			"name": "SoundB7_wav"
+		},
+		{
+			"url": "sounds/SoundB8.wav",
+			"type": "sound",
+			"name": "SoundB8_wav"
+		},
+		{
+			"url": "sounds/SoundB9.wav",
+			"type": "sound",
+			"name": "SoundB9_wav"
+		},
+		{
+			"url": "sounds/SoundBeginGame.wav",
+			"type": "sound",
+			"name": "SoundBeginGame_wav"
+		},
+		{
+			"url": "sounds/SoundBeginKaiPai.wav",
+			"type": "sound",
+			"name": "SoundBeginKaiPai_wav"
+		},
+		{
+			"url": "sounds/SoundBg.mp3",
+			"type": "sound",
+			"name": "SoundBg_mp3"
+		},
+		{
+			"url": "sounds/SoundBtnOver.wav",
+			"type": "sound",
+			"name": "SoundBtnOver_wav"
+		},
+		{
+			"url": "sounds/SoundChip.wav",
+			"type": "sound",
+			"name": "SoundChip_wav"
+		},
+		{
+			"url": "sounds/SoundChouMa.wav",
+			"type": "sound",
+			"name": "SoundChouMa_wav"
+		},
+		{
+			"url": "sounds/SoundGameOver.wav",
+			"type": "sound",
+			"name": "SoundGameOver_wav"
+		},
+		{
+			"url": "sounds/SoundSendCard.wav",
+			"type": "sound",
+			"name": "SoundSendCard_wav"
+		},
+		{
+			"url": "sounds/SoundWarning.wav",
+			"type": "sound",
+			"name": "SoundWarning_wav"
+		},
+		{
+			"url": "assets/brnn_cards.json",
+			"type": "sheet",
+			"name": "brnn_cards",
+			"subkeys": "Calf0_01,Calf0_02,Calf0_03,Calf0_04,Calf0_05,Calf0_06,Calf0_07,Calf0_08,Calf0_09,Calf0_10,Calf1_01,Calf1_02,Calf1_03,Calf1_04,Calf1_05,Calf1_06,Calf1_07,Calf1_08,Calf1_09,Calf1_10,Calf1_11,RightAndWrong1,RightAndWrong2,RightAndWrong3,RightAndWrong4,card0_01,card0_02,card1_01,card1_02,card1_03,card1_04,card1_05,card1_06,card1_07,card1_08,card1_09,card1_10,card1_11,card1_12,card1_13,card2_01,card2_02,card2_03,card2_04,card2_05,card2_06,card2_07,card2_08,card2_09,card2_10,card2_11,card2_12,card2_13,card3_01,card3_02,card3_03,card3_04,card3_05,card3_06,card3_07,card3_08,card3_09,card3_10,card3_11,card3_12,card3_13,card4_01,card5_01,card6_01,card6_02,card6_03,card6_04,card6_05,card6_06,card6_07,card6_08,card6_09,card6_10,card6_11,card6_12,card6_13,card6_14,card6_15,card6_16,card6_17,card6_18,card6_19,card6_20,card6_21,card6_22,card6_23,card6_24,card6_25,card6_26,card6_27,card6_28,card6_29,card6_30,card6_31,card6_32,card6_33,card6_34,card6_35,card6_36,card6_37,card6_38,card6_39,card6_40,card6_41,card6_42,card6_43,card6_44,card6_45,card6_46,card6_47,card6_48,card6_49,card6_50,card6_51,card6_52,card6_53,card6_54,chip_ash,ctrlStatus,fullBtnA,fullBtnB,help_btn1_0,help_btn1_1,help_btn1_2,help_btn2_0,help_btn2_1,help_btn2_2,historyBtn1,historyBtn2,littleChip_0,littleChip_1,littleChip_2,littleChip_3,littleChip_4,littleChip_5,newRecord,quit,scrollBar_bg,scrollBar_line"
+		},
+		{
+			"url": "assets/brnn_env.json",
+			"type": "sheet",
+			"name": "brnn_env",
+			"subkeys": "Calf0_11,DealerInformation,backBtn,beDealer,bePlayer,bookiesList,bottomGlow_0,bottomGlow_1,bottomGlow_2,bottomGlow_3,bottomGlow_4,but_determine,card0_03,card0_04,card0_05,card0_06,card0_07,card0_08,card0_09,card0_10,card0_11,card0_12,card0_13,card_back,card_backAsh,chip_0,chip_1,chip_2,chip_3,chip_4,chip_5,ctrlerBtns0,ctrlerBtns1,dealerList,help1,help2,helpBtn,help_bg,historyBG,historyBtn,jiesuandh,loadingBG,noticeBg,rep_ts,resultShower_z,roomRestrictionBG,scrollBar_mask,soundBtnA,soundBtnB,text_Coins,text_Efforts1,text_Efforts2,text_Efforts3,text_Efforts4,text_Network,text_Rotating,text_time,timeBg,tipBg,win_1,win_2,win_3,win_4,win_5"
+		},
+		{
+			"url": "assets/BG.png",
+			"type": "image",
+			"name": "BG_png"
+		},
+		{
+			"url": "assets/brnn_ani.json",
+			"type": "sheet",
+			"name": "brnn_ani",
+			"subkeys": "lookCards_01,lookCards_02,lookCards_03,lookCards_04,lookCards_05,lookCards_06,lookCards_07,lookCards_08,lookCards_09,lookCards_10,lookCards_11,lookCards_12,lookCards_13,lookCards_14,lookCards_15,lookCards_16,lookCards_17,lookCards_18,lookCards_19,lookCards_20,lookCards_21"
+		}
+	]
+}

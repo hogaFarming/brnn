@@ -72,7 +72,7 @@ var WeixinPlatform = (function (_super) {
                         res = _a.sent();
                         config = res.data.config;
                         this.connectSocket(config.ip, config.port);
-                        return [2 /*return*/, { nickName: "username" }];
+                        return [2 /*return*/, res.data];
                 }
             });
         });
@@ -95,7 +95,9 @@ var WeixinPlatform = (function (_super) {
             var res, evt;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, http.get("/api/game_result", { params: { id: gameId } })];
+                    case 0:
+                        console.log("get game result... ");
+                        return [4 /*yield*/, http.get("/api/game_result", { params: { id: gameId } })];
                     case 1:
                         res = _a.sent();
                         if (res.data.status === 0)
@@ -103,6 +105,55 @@ var WeixinPlatform = (function (_super) {
                         evt = new RemoteEvent(RemoteEvent.GAME_RECEIVED_RESULT);
                         evt.data = res.data;
                         this.dispatchEvent(evt);
+                        return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.bet = function (gameId, amount, playerIdx) {
+        return __awaiter(this, void 0, void 0, function () {
+            var chipTypeMap, res, evt;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        chipTypeMap = {
+                            1000: 0,
+                            5000: 1,
+                            10000: 2,
+                            100000: 3,
+                            500000: 4,
+                            1000000: 5
+                        };
+                        return [4 /*yield*/, http.post("/api/betting", {
+                                data: {
+                                    game_id: gameId,
+                                    chip_type: chipTypeMap[amount],
+                                    betting_type: playerIdx - 1
+                                }
+                            })];
+                    case 1:
+                        res = _a.sent();
+                        if (res.status) {
+                            evt = new RemoteEvent(RemoteEvent.BET);
+                            evt.data = {
+                                amount: amount,
+                                playerIdx: playerIdx
+                            };
+                            this.dispatchEvent(evt);
+                        }
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.getHistory = function (gameId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/game_history", { params: { id: gameId } })];
+                    case 1:
+                        res = _a.sent();
                         return [2 /*return*/, res.data];
                 }
             });
@@ -154,8 +205,10 @@ var WeixinPlatform = (function (_super) {
                 this.dispatchEvent(evt);
             }
             else if (parsed.type === "game_result") {
-                var game_id = parsed.game_id;
-                this.getGameResult(game_id);
+                this.getGameResult(parsed.id);
+            }
+            else if (parsed.type === "game_balance") {
+                this.getGameResult(parsed.id);
             }
         }
         catch (e) {

@@ -12,6 +12,10 @@ declare interface Platform extends egret.EventDispatcher {
 
     getGameResult(gameId: number): Promise<any>;
 
+    bet(gameId: number, amount: number, playerIdx: number): Promise<any>;
+
+    getHistory(gameId: number): Promise<any>;
+
     login(): Promise<any>
 
 }
@@ -44,7 +48,7 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
         let res = await http.get("/api/gameinfo_niuniu");
         let config = res.data.config;
         this.connectSocket(config.ip, config.port);
-        return { nickName: "username" }
+        return res.data;
     }
 
     async getGameState() {
@@ -53,11 +57,43 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
     }
 
     async getGameResult(gameId: number) {
+        console.log("get game result... ");
         let res = await http.get("/api/game_result", { params: { id: gameId } });
         if (res.data.status === 0) return null;
         let evt = new RemoteEvent(RemoteEvent.GAME_RECEIVED_RESULT);
         evt.data = res.data;
         this.dispatchEvent(evt);
+        return res.data;
+    }
+
+    async bet(gameId, amount, playerIdx) {
+        let chipTypeMap = {
+            1000: 0,
+            5000: 1,
+            10000: 2,
+            100000: 3,
+            500000: 4,
+            1000000: 5
+        };
+        let res = await http.post("/api/betting", {
+            data: {
+                game_id: gameId,
+                chip_type: chipTypeMap[amount],
+                betting_type: playerIdx - 1
+            }
+        });
+        if (res.status) {
+            let evt = new RemoteEvent(RemoteEvent.BET);
+            evt.data = {
+                amount,
+                playerIdx
+            };
+            this.dispatchEvent(evt);
+        }
+    }
+
+    async getHistory(gameId) {
+        let res = await http.get("/api/game_history", { params: { id: gameId } });
         return res.data;
     }
 
@@ -98,8 +134,9 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 };
                 this.dispatchEvent(evt);
             } else if (parsed.type === "game_result") {
-                let game_id = parsed.game_id;
-                this.getGameResult(game_id);
+                this.getGameResult(parsed.id);
+            } else if (parsed.type === "game_balance") {
+                this.getGameResult(parsed.id);
             }
         } catch (e) {
             console.error("解析socket数据出错, ", msg);

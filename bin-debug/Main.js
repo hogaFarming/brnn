@@ -72,6 +72,14 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var app = null;
+egret.lifecycle.onPause = function () {
+    console.log("app 进入后台");
+    egret.ticker.pause(); // 关闭渲染与心跳
+};
+egret.lifecycle.onResume = function () {
+    console.log("app 进入前台");
+    egret.ticker.resume(); // 打开渲染与心跳
+};
 var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
@@ -120,7 +128,7 @@ var Main = (function (_super) {
                         return [4 /*yield*/, platform.getGameState()];
                     case 5:
                         gameState = _a.sent();
-                        this.game.init(gameState);
+                        this.game.init(gameState, gameConfig);
                         // this.hideLoading();
                         platform.addEventListener(RemoteEvent.BET, this.onRemoteBet, this);
                         platform.addEventListener(RemoteEvent.GAME_CREATE, this.onRemoteGameCreated, this);
@@ -234,9 +242,7 @@ var Main = (function (_super) {
      * 申请上庄
      */
     Main.prototype.beDealer = function () {
-        // this.game.restart();
-        this.game.showGameResult();
-        // new Dialog("您的余额不足，无法上庄！");
+        new Dialog("您的余额不足，无法上庄！");
     };
     /**
      * 申请下庄
@@ -254,7 +260,7 @@ var Main = (function (_super) {
             return;
         if (this.game.no_betting_time * 1000 <= +new Date)
             return;
-        this.mainBoard.showBetAnimation(amount, playerIdx);
+        platform.bet(this.game.gameId, amount, playerIdx);
     };
     /**
      * 服务端下注触发
@@ -264,8 +270,13 @@ var Main = (function (_super) {
         this.mainBoard.showBetAnimation(data.amount, data.playerIdx);
     };
     Main.prototype.onRemoteGameCreated = function (e) {
-        var data = e.data;
-        this.game.createNewGame(data.game_id, data.no_betting_time, data.lottery_time);
+        this.game.nextNewGame = e.data;
+        // if (this.game.currentPhase && this.game.currentPhase.type === PhaseType.Lottery && this.game.currentPhase.countDown > 0) {
+        //     this.game.nextNewGame = e.data;
+        // } else {
+        //     let data = e.data;
+        //     this.game.createNewGame(data.game_id, data.no_betting_time, data.lottery_time);
+        // }
     };
     Main.prototype.onRemoteGameReceivedResult = function (e) {
         var data = e.data;

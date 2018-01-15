@@ -7,7 +7,7 @@ class MainBoard extends egret.DisplayObjectContainer {
     private txtScore: egret.TextField; // 成绩
     private txtBetting: egret.TextField; // 投注
 
-    private spDealer: egret.Sprite; // 当前坐庄
+    private txtDealerType: egret.TextField; // 当前坐庄
     private txtDealerMoney: egret.TextField; // 庄家余额
     private txtDealerScore: egret.TextField; // 庄家成绩
     private txtDealerRounds: egret.TextField; // 庄家局数
@@ -25,10 +25,40 @@ class MainBoard extends egret.DisplayObjectContainer {
 
     private spPlayerAreas: Array<egret.Sprite>; // 下筹区域
     private betChips: Array<Chip> = []; // 已下筹码
+    private txtCurrBettings: Array<egret.TextField> = []; // 显示四个位置下注金额
+    public currBettings: Array<number> = [0, 0, 0, 0]; // 当前下注
 
     constructor() {
         super();
         this.addSprites();
+    }
+
+    public setMoney(money: number) {
+        this.txtMoney.text = money + "";
+    }
+
+    public setScore(num: number) {
+        this.txtScore.text = num + "";
+    }
+
+    public setBetting(num: number) {
+        this.txtBetting.text = num + "";
+    }
+
+    public setDealerMoney(money: number) {
+        this.txtDealerMoney.text = money + "";
+    }
+
+    public setDealerScore(num: number) {
+        this.txtDealerScore.text = num + "";
+    }
+
+    public setDealerRounds(num: number) {
+        this.txtDealerRounds.text = num + "";
+    }
+
+    public setDealerType(dealerType: string) {
+        this.txtDealerType.text = dealerType ;
     }
 
     private addSprites(): void {
@@ -39,6 +69,7 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtScore = this.createInfoText("0", 98, 641);
         this.txtBetting = this.createInfoText("0", 98, 677);
 
+        this.txtDealerType = this.createInfoText("", 120, 39);
         this.txtDealerMoney = this.createInfoText("0", 120, 75);
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
@@ -189,6 +220,38 @@ class MainBoard extends egret.DisplayObjectContainer {
         }
 
         this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+
+        this.currBettings[playerIdx - 1] = this.currBettings[playerIdx - 1] + value;
+        let txtBettingPos = [
+            { x: 135, y: 250 },
+            { x: 380, y: 285 },
+            { x: 673, y: 280 },
+            { x: 940, y: 246 }
+        ];
+        this.txtCurrBettings.forEach(item => {
+            try {
+                this.removeChild(item);
+            } catch (e) {}
+        });
+        this.txtCurrBettings = [];
+        txtBettingPos.forEach((pos, index) => {
+            let betValue = this.currBettings[index];
+            if (!betValue) return;
+            let txt = new egret.TextField();
+            txt.text = "已下注： " + betValue;
+            txt.textColor = 0xc9b667;
+            txt.x = pos.x;
+            txt.y = pos.y;
+            txt.size = 20;
+            this.txtCurrBettings.push(txt);
+            this.addChild(txt);
+        });
+
+        let totalBettings = 0;
+        this.currBettings.forEach(num => {
+            totalBettings += num;
+        });
+        this.setMoney(app.game.coin_num - totalBettings);
     }
 
     private selectChip(idx: number): void {
@@ -212,6 +275,22 @@ class MainBoard extends egret.DisplayObjectContainer {
         let texture: egret.Texture = utils.getRes(name);
         result.texture = texture;
         return result;
+    }
+
+    public clearBetChips() {
+        try {
+            this.betChips.forEach(item => {
+                this.removeChild(item);
+            });
+            this.betChips = [];
+            this.txtCurrBettings.forEach(item => {
+                this.removeChild(item);
+            });
+            this.txtCurrBettings = [];
+            this.currBettings = [0, 0, 0, 0];
+        } catch (e) {
+
+        }
     }
 
     private showHistory(): void {
