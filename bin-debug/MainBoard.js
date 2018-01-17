@@ -49,7 +49,7 @@ var MainBoard = (function (_super) {
         this.txtScore = this.createInfoText("0", 98, 641);
         this.txtBetting = this.createInfoText("0", 98, 677);
         this.txtDealerType = this.createInfoText("", 120, 39);
-        this.txtDealerMoney = this.createInfoText("0", 120, 75);
+        this.txtDealerMoney = this.createInfoText("--", 120, 75);
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
         this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.showHistory, 263, 610);
@@ -223,6 +223,7 @@ var MainBoard = (function (_super) {
             totalBettings += num;
         });
         this.setMoney(app.game.coin_num - totalBettings);
+        this.setBetting(totalBettings);
     };
     MainBoard.prototype.selectChip = function (idx) {
         app.playEffectSound("ClickSound_wav");
@@ -256,6 +257,7 @@ var MainBoard = (function (_super) {
             });
             this.txtCurrBettings = [];
             this.currBettings = [0, 0, 0, 0];
+            this.setBetting(0);
         }
         catch (e) {
         }

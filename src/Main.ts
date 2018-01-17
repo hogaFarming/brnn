@@ -87,6 +87,16 @@ class Main extends egret.DisplayObjectContainer {
         let gameConfig = await platform.getGameConfig();
         let gameState: GameStateData = await platform.getGameState();
         this.game.init(gameState, gameConfig);
+        
+        platform.getUserMoney().then(result => {
+            app.mainBoard.setMoney(result.num);
+            app.mainBoard.setScore(result.user_total_betting_num);
+        });
+        platform.getDealerMoney(gameState.id).then(result => {
+            app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
+            app.mainBoard.setDealerScore(result.banker_total_betting_num);
+            app.mainBoard.setDealerRounds(result.banker_total_game_num);
+        });
         // this.hideLoading();
 
         platform.addEventListener(RemoteEvent.BET, this.onRemoteBet, this);
@@ -195,10 +205,10 @@ class Main extends egret.DisplayObjectContainer {
      * 下注
      */
     public postBet(playerIdx: number, amount: number) {
-        // TODO 下注接口
         if (!this.game.currentPhase) return;
         if (this.game.currentPhase.type !== PhaseType.Betting) return;
         if (this.game.no_betting_time * 1000 <= +new Date) return;
+        if (this.game.is_banker) return;
         platform.bet(this.game.gameId, amount, playerIdx);
     }
 

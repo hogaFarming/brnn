@@ -35,6 +35,7 @@ class LeftControl extends egret.Sprite {
         panel.addChild(bitmap);
         panel.x = 0;
         panel.y = 210;
+        panel.visible = false;
         this.addChild(panel);
         this.addPanelBtn(ButtonModels.BackButton, this.onClickBackBtn, 12, 18);
         this.soundBtn = this.addPanelBtn(ButtonModels.SoundButtonA, this.handleClickSoundBtn, 73, 118);

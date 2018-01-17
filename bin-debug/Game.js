@@ -24,6 +24,8 @@ var Game = (function (_super) {
     function Game() {
         var _this = _super.call(this) || this;
         _this.coin_num = 0; // 余额
+        _this.is_banker = 0;
+        _this.banker_username = "";
         _this.startIndex = 0; // 从哪个玩家开始发牌
         _this.currIndex = 0; // 当前发到第几张
         _this.spPlayerResults = []; // 翻牌结果
@@ -180,9 +182,7 @@ var Game = (function (_super) {
         else {
             console.log("set game state status:" + stateData.status);
             this.gameStateData = stateData;
-            if (stateData.banker_type !== undefined) {
-                app.mainBoard.setDealerType(stateData.banker_type === 0 ? "系统上庄" : "玩家上庄");
-            }
+            app.mainBoard.setDealerType(stateData.banker_username || "");
         }
     };
     Game.prototype.setCurrentPhase = function (phase) {
@@ -448,6 +448,17 @@ var Game = (function (_super) {
         txtFinnalBetting.y = 280;
         txtFinnalBetting.text = this.gameStateData.finnal_betting_num + "";
         this.spResultContainer.addChild(txtFinnalBetting);
+        if (this.nextNewGame) {
+            platform.getUserMoney().then(function (result) {
+                app.mainBoard.setMoney(result.num);
+                app.mainBoard.setScore(result.user_total_betting_num);
+            });
+            platform.getDealerMoney(this.nextNewGame.game_id).then(function (result) {
+                app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
+                app.mainBoard.setDealerScore(result.banker_total_betting_num);
+                app.mainBoard.setDealerRounds(result.banker_total_game_num);
+            });
+        }
     };
     Game.prototype.createGameResultItem = function (playerIdx) {
         var sp = new egret.Sprite();

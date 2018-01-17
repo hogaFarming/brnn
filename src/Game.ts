@@ -515,6 +515,18 @@ class Game extends egret.Sprite {
         txtFinnalBetting.y = 280;
         txtFinnalBetting.text = this.gameStateData.finnal_betting_num + "";
         this.spResultContainer.addChild(txtFinnalBetting);
+
+        if (this.nextNewGame) {
+            platform.getUserMoney().then(result => {
+                app.mainBoard.setMoney(result.num);
+                app.mainBoard.setScore(result.user_total_betting_num);
+            });
+            platform.getDealerMoney(this.nextNewGame.game_id).then(result => {
+                app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
+                app.mainBoard.setDealerScore(result.banker_total_betting_num);
+                app.mainBoard.setDealerRounds(result.banker_total_game_num);
+            });
+        }
     }
 
     createGameResultItem(playerIdx: number): egret.Sprite {

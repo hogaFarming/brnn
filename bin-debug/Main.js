@@ -129,6 +129,15 @@ var Main = (function (_super) {
                     case 5:
                         gameState = _a.sent();
                         this.game.init(gameState, gameConfig);
+                        platform.getUserMoney().then(function (result) {
+                            app.mainBoard.setMoney(result.num);
+                            app.mainBoard.setScore(result.user_total_betting_num);
+                        });
+                        platform.getDealerMoney(gameState.id).then(function (result) {
+                            app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
+                            app.mainBoard.setDealerScore(result.banker_total_betting_num);
+                            app.mainBoard.setDealerRounds(result.banker_total_game_num);
+                        });
                         // this.hideLoading();
                         platform.addEventListener(RemoteEvent.BET, this.onRemoteBet, this);
                         platform.addEventListener(RemoteEvent.GAME_CREATE, this.onRemoteGameCreated, this);
@@ -242,7 +251,22 @@ var Main = (function (_super) {
      * 申请上庄
      */
     Main.prototype.beDealer = function () {
-        new Dialog("您的余额不足，无法上庄！");
+        return __awaiter(this, void 0, void 0, function () {
+            var result;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        if (this.game.coin_num < BeDealerMinLimit) {
+                            new Dialog("您的余额不足，无法上庄！");
+                            return [2 /*return*/];
+                        }
+                        return [4 /*yield*/, platform.applyDealer()];
+                    case 1:
+                        result = _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
     };
     /**
      * 申请下庄

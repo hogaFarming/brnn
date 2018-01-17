@@ -26,7 +26,7 @@ var HistoryWindow = (function (_super) {
         var _this = _super.call(this) || this;
         _this.rightFlag = utils.getRes("brnn_cards.RightAndWrong1");
         _this.wrongFlag = utils.getRes("brnn_cards.RightAndWrong2");
-        _this.recordsData = mockRecordsData;
+        _this.recordsData = [];
         _this.showingIdx = 0;
         _this.width = 754;
         _this.height = 266;
@@ -84,7 +84,7 @@ var HistoryWindow = (function (_super) {
         var visibleRecords = this.recordsData.slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols);
         visibleRecords.forEach(function (recordItem, colIndex) {
             recordItem.forEach(function (resultFlag, rowIndex) {
-                var bm = new egret.Bitmap(resultFlag ? _this.rightFlag : _this.wrongFlag);
+                var bm = new egret.Bitmap(resultFlag === 1 ? _this.rightFlag : _this.wrongFlag);
                 bm.x = colIndex * cellWidth;
                 bm.y = rowIndex * cellHeight;
                 _this.spRecords.addChild(bm);
@@ -92,7 +92,13 @@ var HistoryWindow = (function (_super) {
         });
     };
     HistoryWindow.prototype.onOpen = function () {
-        this.render();
+        var _this = this;
+        if (app.game.gameId) {
+            platform.getHistory(app.game.gameId).then(function (result) {
+                _this.recordsData = result;
+                _this.render();
+            });
+        }
         return true;
     };
     HistoryWindow.prototype.onClose = function () {

@@ -25,7 +25,7 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
     private wrongFlag = utils.getRes("brnn_cards.RightAndWrong2");
 
     private spRecords: egret.Sprite;
-    private recordsData: Array<RecordItem> = mockRecordsData;
+    private recordsData: Array<RecordItem> = [];
     private showingIdx: number = 0;
 
     constructor() {
@@ -93,7 +93,7 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
         let visibleRecords = this.recordsData.slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols);
         visibleRecords.forEach((recordItem, colIndex) => {
             recordItem.forEach((resultFlag, rowIndex) => {
-                let bm = new egret.Bitmap(resultFlag ? this.rightFlag : this.wrongFlag);
+                let bm = new egret.Bitmap(resultFlag === 1 ? this.rightFlag : this.wrongFlag);
                 bm.x = colIndex * cellWidth;
                 bm.y = rowIndex * cellHeight;
                 this.spRecords.addChild(bm);
@@ -104,7 +104,7 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
     public onOpen(): boolean {
         if (app.game.gameId) {
             platform.getHistory(app.game.gameId).then(result => {
-                this.recordsData = result.list;
+                this.recordsData = result;
                 this.render();
             });
         }

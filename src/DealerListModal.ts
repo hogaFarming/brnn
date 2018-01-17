@@ -19,11 +19,14 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
         this.addChild(bg);
         let factory = new ButtonFactory();
 
-        this.addTxt(BeDealerMinLimit + "", 62, 358);
-        this.addTxt(AreaLimit + "", 250, 358);
-        this.addTxt(PersonLimit + "", 452, 358);
+        this.addTxt(BeDealerMinLimit + "", 70, 358);
+        this.addTxt(AreaLimit + "", 260, 358);
+        this.addTxt(PersonLimit + "", 460, 358);
 
         this.spDealerList = new egret.Sprite();
+        this.addChild(this.spDealerList);
+        this.spDealerList.x = 28;
+        this.spDealerList.y = 90;
     }
 
     private addTxt(text: string, x: number, y: number): void {
@@ -40,12 +43,11 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
         this.spDealerList.removeChildren();
         let text = this.dealerList.map(item => {
             return item.apply_name;
-        }).join("， ");
+        }).join("，");
         let txt = new egret.TextField();
-        txt.x = 0;
-        txt.y = 0;
-        txt.width = this.width - 20;
-        txt.height = this.height - 40;
+        txt.width = 540;
+        txt.height = 200;
+        txt.size = 26;
         txt.text = text;
         txt.textColor = 0xffffff;
         this.spDealerList.addChild(txt);
@@ -53,7 +55,7 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
 
     public onOpen(): boolean {
         platform.getDealerList().then(result => {
-            this.dealerList = result.list;
+            this.dealerList = result;
             this.render();
         });
         return true;

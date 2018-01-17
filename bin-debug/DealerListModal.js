@@ -8,13 +8,14 @@ var __extends = this && this.__extends || function __extends(t, e) {
 for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
 r.prototype = e.prototype, t.prototype = new r();
 };
-var BeDealerMinLimit = 50000000;
-var AreaLimit = 200000000;
-var PersonLimit = 20000000;
+var BeDealerMinLimit = 300000;
+var AreaLimit = 2000000;
+var PersonLimit = 200000;
 var DealerListWindow = (function (_super) {
     __extends(DealerListWindow, _super);
     function DealerListWindow() {
         var _this = _super.call(this) || this;
+        _this.dealerList = [];
         _this.width = 594;
         _this.height = 397;
         _this.init();
@@ -24,9 +25,13 @@ var DealerListWindow = (function (_super) {
         var bg = new egret.Bitmap(utils.getRes("brnn_env.bookiesList"));
         this.addChild(bg);
         var factory = new ButtonFactory();
-        this.addTxt(BeDealerMinLimit + "", 62, 358);
-        this.addTxt(AreaLimit + "", 250, 358);
-        this.addTxt(PersonLimit + "", 452, 358);
+        this.addTxt(BeDealerMinLimit + "", 70, 358);
+        this.addTxt(AreaLimit + "", 260, 358);
+        this.addTxt(PersonLimit + "", 460, 358);
+        this.spDealerList = new egret.Sprite();
+        this.addChild(this.spDealerList);
+        this.spDealerList.x = 28;
+        this.spDealerList.y = 90;
     };
     DealerListWindow.prototype.addTxt = function (text, x, y) {
         var txt1 = new egret.TextField();
@@ -38,9 +43,24 @@ var DealerListWindow = (function (_super) {
         this.addChild(txt1);
     };
     DealerListWindow.prototype.render = function () {
+        this.spDealerList.removeChildren();
+        var text = this.dealerList.map(function (item) {
+            return item.apply_name;
+        }).join("，");
+        var txt = new egret.TextField();
+        txt.width = 540;
+        txt.height = 200;
+        txt.size = 26;
+        txt.text = text;
+        txt.textColor = 0xffffff;
+        this.spDealerList.addChild(txt);
     };
     DealerListWindow.prototype.onOpen = function () {
-        this.render();
+        var _this = this;
+        platform.getDealerList().then(function (result) {
+            _this.dealerList = result;
+            _this.render();
+        });
         return true;
     };
     DealerListWindow.prototype.onClose = function () {

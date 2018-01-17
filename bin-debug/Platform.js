@@ -77,6 +77,32 @@ var WeixinPlatform = (function (_super) {
             });
         });
     };
+    WeixinPlatform.prototype.getUserMoney = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/get_total")];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.getDealerMoney = function (gameId) {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/get_total_banker", { params: { game_id: gameId } })];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
     WeixinPlatform.prototype.getGameState = function () {
         return __awaiter(this, void 0, void 0, function () {
             var res;
@@ -148,13 +174,16 @@ var WeixinPlatform = (function (_super) {
     };
     WeixinPlatform.prototype.getHistory = function (gameId) {
         return __awaiter(this, void 0, void 0, function () {
-            var res;
+            var res, list;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, http.get("/api/game_history", { params: { id: gameId } })];
                     case 1:
                         res = _a.sent();
-                        return [2 /*return*/, res.data];
+                        list = res.data.map(function (item) {
+                            return [item.player_a_result, item.player_b_result, item.player_c_result, item.player_d_result];
+                        });
+                        return [2 /*return*/, list];
                 }
             });
         });
@@ -172,6 +201,32 @@ var WeixinPlatform = (function (_super) {
                         _a.sent();
                         _a.label = 3;
                     case 3: return [2 /*return*/];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.getDealerList = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/banker_list")];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.applyDealer = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/banker_apply")];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/];
                 }
             });
         });

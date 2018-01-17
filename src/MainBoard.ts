@@ -45,7 +45,7 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtBetting.text = num + "";
     }
 
-    public setDealerMoney(money: number) {
+    public setDealerMoney(money: number | string) {
         this.txtDealerMoney.text = money + "";
     }
 
@@ -70,7 +70,7 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtBetting = this.createInfoText("0", 98, 677);
 
         this.txtDealerType = this.createInfoText("", 120, 39);
-        this.txtDealerMoney = this.createInfoText("0", 120, 75);
+        this.txtDealerMoney = this.createInfoText("--", 120, 75);
         this.txtDealerScore = this.createInfoText("0", 120, 111);
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
 
@@ -252,6 +252,7 @@ class MainBoard extends egret.DisplayObjectContainer {
             totalBettings += num;
         });
         this.setMoney(app.game.coin_num - totalBettings);
+        this.setBetting(totalBettings);
     }
 
     private selectChip(idx: number): void {
@@ -288,6 +289,7 @@ class MainBoard extends egret.DisplayObjectContainer {
             });
             this.txtCurrBettings = [];
             this.currBettings = [0, 0, 0, 0];
+            this.setBetting(0);
         } catch (e) {
 
         }
