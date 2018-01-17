@@ -61,6 +61,16 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtDealerType.text = dealerType ;
     }
 
+    public setBeDealerBtn(isDealder: boolean) {
+        if (isDealder) {
+            this.btnBeDealer.visible = false;
+            this.btnBePlayer.visible = true;
+        } else {
+            this.btnBeDealer.visible = true;
+            this.btnBePlayer.visible = false;
+        }
+    }
+
     private addSprites(): void {
         this.addBitmap("brnn_env.DealerInformation", 21, 28);
         this.addBitmap("brnn_env.timeBg", (1280 - 225) / 2, 7);
@@ -177,7 +187,7 @@ class MainBoard extends egret.DisplayObjectContainer {
         // this.showBetAnimation(amount, index);
     }
 
-    public showBetAnimation(value: number, playerIdx: number) {
+    public showBetAnimation(value: number, playerIdx: number, isFromOther: boolean) {
         let originChip = this.chips.filter(item => item.value === value)[0];
         if (!originChip) return;
         
@@ -188,8 +198,8 @@ class MainBoard extends egret.DisplayObjectContainer {
         let height = spArea.height - (padding * 2);
         let targetX = spArea.x + Math.round(Math.random() * width) + padding;
         let targetY = spArea.y + Math.round(Math.random() * height) + padding;
-        let startX = originChip.x;
-        let startY = originChip.y;
+        let startX = isFromOther ? 1230 : originChip.x;
+        let startY = isFromOther ? 500 : originChip.y;
         let currX = startX;
         let currY = startY;
         let lastFrameTime = egret.getTimer();
@@ -213,13 +223,14 @@ class MainBoard extends egret.DisplayObjectContainer {
             if (currY < targetY) {
                 currX = targetX;
                 currY = targetY;
-                this.removeEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+            } else {
+                requestAnimationFrame(onEnterFrame);
             }
             chip.x = currX;
             chip.y = currY;
         }
 
-        this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+        requestAnimationFrame(onEnterFrame);
 
         this.currBettings[playerIdx - 1] = this.currBettings[playerIdx - 1] + value;
         let txtBettingPos = [
@@ -247,12 +258,14 @@ class MainBoard extends egret.DisplayObjectContainer {
             this.addChild(txt);
         });
 
-        let totalBettings = 0;
-        this.currBettings.forEach(num => {
-            totalBettings += num;
-        });
-        this.setMoney(app.game.coin_num - totalBettings);
-        this.setBetting(totalBettings);
+        if (!isFromOther) {
+            let totalBettings = 0;
+            this.currBettings.forEach(num => {
+                totalBettings += num;
+            });
+            this.setMoney(app.game.coin_num - totalBettings);
+            this.setBetting(totalBettings);
+        }
     }
 
     private selectChip(idx: number): void {

@@ -21,7 +21,7 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
     private prevDisabledBtn: Button;
     private nextBtn: Button;
     private nextDisabledBtn: Button;
-    private rightFlag = utils.getRes("brnn_cards.RightAndWrong1");
+    private rightFlag = utils.getRes("brnn_cards.RightAndWrong3");
     private wrongFlag = utils.getRes("brnn_cards.RightAndWrong2");
 
     private spRecords: egret.Sprite;

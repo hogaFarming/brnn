@@ -54,9 +54,7 @@ class LoadingUI extends egret.Sprite implements RES.PromiseTaskReporter {
         this.addChild(this.gameTips);
 
         this.nextTip();
-        this.timer = new egret.Timer(3000, 0);
-        this.timer.addEventListener(egret.TimerEvent.TIMER, this.nextTip, this);
-        this.timer.start();
+        new Timer(this.nextTip.bind(this), () => {}, 3000);
     }
 
     private nextTip(): void {

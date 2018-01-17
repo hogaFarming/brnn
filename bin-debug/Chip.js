@@ -60,6 +60,7 @@ var Chip = (function (_super) {
     Chip.prototype.render = function () {
         this.removeChildren();
         var bmIndex = this.active ? 1 : this.disabled ? 2 : 0;
+        this.txt.height = this.active ? 110 : 100;
         this.addChild(this.bitmaps[bmIndex]);
         this.addChild(this.txt);
     };
@@ -77,4 +78,3 @@ var Chip = (function (_super) {
     return Chip;
 }(egret.Sprite));
 __reflect(Chip.prototype, "Chip");
-//# sourceMappingURL=Chip.js.map

@@ -42,6 +42,16 @@ var MainBoard = (function (_super) {
     MainBoard.prototype.setDealerType = function (dealerType) {
         this.txtDealerType.text = dealerType;
     };
+    MainBoard.prototype.setBeDealerBtn = function (isDealder) {
+        if (isDealder) {
+            this.btnBeDealer.visible = false;
+            this.btnBePlayer.visible = true;
+        }
+        else {
+            this.btnBeDealer.visible = true;
+            this.btnBePlayer.visible = false;
+        }
+    };
     MainBoard.prototype.addSprites = function () {
         this.addBitmap("brnn_env.DealerInformation", 21, 28);
         this.addBitmap("brnn_env.timeBg", (1280 - 225) / 2, 7);
@@ -150,7 +160,7 @@ var MainBoard = (function (_super) {
         app.postBet(index, amount);
         // this.showBetAnimation(amount, index);
     };
-    MainBoard.prototype.showBetAnimation = function (value, playerIdx) {
+    MainBoard.prototype.showBetAnimation = function (value, playerIdx, isFromOther) {
         var _this = this;
         var originChip = this.chips.filter(function (item) { return item.value === value; })[0];
         if (!originChip)
@@ -162,8 +172,8 @@ var MainBoard = (function (_super) {
         var height = spArea.height - (padding * 2);
         var targetX = spArea.x + Math.round(Math.random() * width) + padding;
         var targetY = spArea.y + Math.round(Math.random() * height) + padding;
-        var startX = originChip.x;
-        var startY = originChip.y;
+        var startX = isFromOther ? 1230 : originChip.x;
+        var startY = isFromOther ? 500 : originChip.y;
         var currX = startX;
         var currY = startY;
         var lastFrameTime = egret.getTimer();
@@ -185,12 +195,14 @@ var MainBoard = (function (_super) {
             if (currY < targetY) {
                 currX = targetX;
                 currY = targetY;
-                _this.removeEventListener(egret.Event.ENTER_FRAME, onEnterFrame, _this);
+            }
+            else {
+                requestAnimationFrame(onEnterFrame);
             }
             chip.x = currX;
             chip.y = currY;
         };
-        this.addEventListener(egret.Event.ENTER_FRAME, onEnterFrame, this);
+        requestAnimationFrame(onEnterFrame);
         this.currBettings[playerIdx - 1] = this.currBettings[playerIdx - 1] + value;
         var txtBettingPos = [
             { x: 135, y: 250 },
@@ -218,12 +230,14 @@ var MainBoard = (function (_super) {
             _this.txtCurrBettings.push(txt);
             _this.addChild(txt);
         });
-        var totalBettings = 0;
-        this.currBettings.forEach(function (num) {
-            totalBettings += num;
-        });
-        this.setMoney(app.game.coin_num - totalBettings);
-        this.setBetting(totalBettings);
+        if (!isFromOther) {
+            var totalBettings_1 = 0;
+            this.currBettings.forEach(function (num) {
+                totalBettings_1 += num;
+            });
+            this.setMoney(app.game.coin_num - totalBettings_1);
+            this.setBetting(totalBettings_1);
+        }
     };
     MainBoard.prototype.selectChip = function (idx) {
         app.playEffectSound("ClickSound_wav");
@@ -277,4 +291,3 @@ var MainBoard = (function (_super) {
     return MainBoard;
 }(egret.DisplayObjectContainer));
 __reflect(MainBoard.prototype, "MainBoard");
-//# sourceMappingURL=MainBoard.js.map

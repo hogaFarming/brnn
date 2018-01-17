@@ -53,9 +53,7 @@ var LoadingUI = (function (_super) {
         this.gameTips.textAlign = "center";
         this.addChild(this.gameTips);
         this.nextTip();
-        this.timer = new egret.Timer(3000, 0);
-        this.timer.addEventListener(egret.TimerEvent.TIMER, this.nextTip, this);
-        this.timer.start();
+        new Timer(this.nextTip.bind(this), function () { }, 3000);
     };
     LoadingUI.prototype.nextTip = function () {
         this.tipIdx += 1;
@@ -73,4 +71,3 @@ var LoadingUI = (function (_super) {
     return LoadingUI;
 }(egret.Sprite));
 __reflect(LoadingUI.prototype, "LoadingUI", ["RES.PromiseTaskReporter"]);
-//# sourceMappingURL=LoadingUI.js.map

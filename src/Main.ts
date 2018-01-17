@@ -29,15 +29,6 @@
 
 let app: Main = null;
 
-egret.lifecycle.onPause = ()=> {
-    console.log("app 进入后台");
-    egret.ticker.pause(); // 关闭渲染与心跳
-}
-egret.lifecycle.onResume = ()=> {
-    console.log("app 进入前台");
-    egret.ticker.resume(); // 打开渲染与心跳
-}
-
 class Main extends egret.DisplayObjectContainer {
     public mainBoard: MainBoard;
     public game: Game;
@@ -66,11 +57,11 @@ class Main extends egret.DisplayObjectContainer {
         })
 
         egret.lifecycle.onPause = () => {
-            egret.ticker.pause();
+            // egret.ticker.pause();
         }
 
         egret.lifecycle.onResume = () => {
-            egret.ticker.resume();
+            // egret.ticker.resume();
         }
 
         this.runGame().catch(e => {
@@ -91,6 +82,7 @@ class Main extends egret.DisplayObjectContainer {
         platform.getUserMoney().then(result => {
             app.mainBoard.setMoney(result.num);
             app.mainBoard.setScore(result.user_total_betting_num);
+            this.game.coin_num = result.num;
         });
         platform.getDealerMoney(gameState.id).then(result => {
             app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
@@ -172,6 +164,7 @@ class Main extends egret.DisplayObjectContainer {
     public playEffectSound(resource: string);
     public playEffectSound(resource: egret.Sound);
     public playEffectSound(resource: string | egret.Sound) {
+        if (!this.bgmEnabled) return;
         if (typeof resource === "string") {
             let sound: egret.Sound = RES.getRes(resource);
             this.effectChannel = sound.play(0, 1);
@@ -198,7 +191,7 @@ class Main extends egret.DisplayObjectContainer {
      * 申请下庄
      */
     public bePlayer() {
-        
+        platform.applyPlayer();
     }
 
     /**
@@ -217,7 +210,8 @@ class Main extends egret.DisplayObjectContainer {
      */
     public onRemoteBet(e: RemoteEvent) {
         let data = e.data;
-        this.mainBoard.showBetAnimation(data.amount, data.playerIdx);
+        if (data.gameId !== this.game.gameId) return;
+        this.mainBoard.showBetAnimation(data.amount, data.playerIdx, data.isFromOther);
     }
 
     public onRemoteGameCreated(e: RemoteEvent) {

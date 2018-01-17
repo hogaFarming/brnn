@@ -74,4 +74,3 @@ var utils = {
         return new Date(unixTime * 1000);
     }
 };
-//# sourceMappingURL=utils.js.map

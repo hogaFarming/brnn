@@ -94,7 +94,7 @@ class Card extends egret.Sprite {
         this.currPosition = utils.extends({}, Card.StartPos);
         this.spBackSide = this.createBackSide();
         this.spFrontSide = this.createFrontSide();
-        this.addEventListener(egret.Event.ENTER_FRAME, this.onFlyFrame, this);
+        requestAnimationFrame(this.onFlyFrame.bind(this));
         this.lastFrameTime = egret.getTimer();
     }
 
@@ -124,7 +124,7 @@ class Card extends egret.Sprite {
         this.spLookCard.width = 614;
         this.spLookCard.height = 244;
         this.lookCardCallBack = callback;
-        this.addEventListener(egret.Event.ENTER_FRAME, this.onLookCardFrame, this);
+        requestAnimationFrame(this.onLookCardFrame.bind(this));
     }
 
     private onFlyFrame() {
@@ -150,8 +150,9 @@ class Card extends egret.Sprite {
             this.currPosition.x = this.finalPositon.x;
             this.currPosition.y = this.finalPositon.y;
             this.rotation = 0;
-            this.removeEventListener(egret.Event.ENTER_FRAME, this.onFlyFrame, this);
-            this.once(egret.Event.ENTER_FRAME, this.onFlyComplete, this);
+            requestAnimationFrame(this.onFlyComplete.bind(this));
+        } else {
+            requestAnimationFrame(this.onFlyFrame.bind(this));
         }
 
         this.render();
@@ -174,13 +175,13 @@ class Card extends egret.Sprite {
             bm.y = 0;
             this.spLookCard.addChild(bm);
             this.render();
+            requestAnimationFrame(this.onLookCardFrame.bind(this));
         }
     }
 
     private onLookCardComplete() {
         console.log("lookcard complete")
         this.state = CardState.Shown;
-        this.removeEventListener(egret.Event.ENTER_FRAME, this.onLookCardFrame, this);
         this.render();
         if (this.lookCardCallBack) {
             this.lookCardCallBack();

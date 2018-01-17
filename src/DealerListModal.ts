@@ -42,7 +42,7 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
     private render(): void {
         this.spDealerList.removeChildren();
         let text = this.dealerList.map(item => {
-            return item.apply_name;
+            return item.apply_name + "（" + item.banker_coin + "）";
         }).join("，");
         let txt = new egret.TextField();
         txt.width = 540;

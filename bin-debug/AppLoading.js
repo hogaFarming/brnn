@@ -36,9 +36,7 @@ var AppLoading = (function (_super) {
             return bm;
         });
         this.nextText();
-        var timer = new egret.Timer(450, 0);
-        timer.addEventListener(egret.TimerEvent.TIMER, this.nextText, this);
-        timer.start();
+        new Timer(this.nextText.bind(this), function () { }, 450);
     };
     AppLoading.prototype.nextText = function () {
         this.currIdx += 1;
@@ -52,4 +50,3 @@ var AppLoading = (function (_super) {
     return AppLoading;
 }(egret.Sprite));
 __reflect(AppLoading.prototype, "AppLoading");
-//# sourceMappingURL=AppLoading.js.map

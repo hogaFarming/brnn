@@ -24,6 +24,8 @@ declare interface Platform extends egret.EventDispatcher {
 
     applyDealer(): Promise<any>;
 
+    applyPlayer(): Promise<any>;
+
     login(): Promise<any>
 
 }
@@ -103,8 +105,10 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
         if (res.status) {
             let evt = new RemoteEvent(RemoteEvent.BET);
             evt.data = {
+                gameId: gameId,
                 amount,
-                playerIdx
+                playerIdx,
+                isFromOther: false
             };
             this.dispatchEvent(evt);
         }
@@ -133,6 +137,10 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     async applyDealer() {
         let res = await http.get("/api/banker_apply");
+    }
+
+    async applyPlayer() {
+        let res = await http.get("/api/down_banker");
     }
 
     connectSocket(address: string, port: number) {
@@ -167,6 +175,23 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 this.getGameResult(parsed.id);
             } else if (parsed.type === "game_balance") {
                 this.getGameResult(parsed.id);
+            } else if (parsed.type === "game_user_betting") {
+                let chipTypeMap2 = {
+                    0: 1000,
+                    1: 5000,
+                    2: 10000,
+                    3: 100000,
+                    4: 500000,
+                    5: 1000000
+                };
+                let evt = new RemoteEvent(RemoteEvent.BET);
+                evt.data = {
+                    gameId: parsed.game_id,
+                    amount: chipTypeMap2[parsed.chip_type],
+                    playerIdx: parsed.betting_type + 1,
+                    isFromOther: true
+                };
+                this.dispatchEvent(evt);
             }
         } catch (e) {
             console.error("解析socket数据出错, ", msg);

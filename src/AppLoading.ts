@@ -31,9 +31,7 @@ class AppLoading extends egret.Sprite {
         });
         
         this.nextText();
-        let timer = new egret.Timer(450, 0);
-        timer.addEventListener(egret.TimerEvent.TIMER, this.nextText, this);
-        timer.start();
+        new Timer(this.nextText.bind(this), () => {}, 450);
     }
 
     private nextText() {

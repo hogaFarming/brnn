@@ -162,8 +162,10 @@ var WeixinPlatform = (function (_super) {
                         if (res.status) {
                             evt = new RemoteEvent(RemoteEvent.BET);
                             evt.data = {
+                                gameId: gameId,
                                 amount: amount,
-                                playerIdx: playerIdx
+                                playerIdx: playerIdx,
+                                isFromOther: false
                             };
                             this.dispatchEvent(evt);
                         }
@@ -231,6 +233,19 @@ var WeixinPlatform = (function (_super) {
             });
         });
     };
+    WeixinPlatform.prototype.applyPlayer = function () {
+        return __awaiter(this, void 0, void 0, function () {
+            var res;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0: return [4 /*yield*/, http.get("/api/down_banker")];
+                    case 1:
+                        res = _a.sent();
+                        return [2 /*return*/];
+                }
+            });
+        });
+    };
     WeixinPlatform.prototype.connectSocket = function (address, port) {
         this.ws = new egret.WebSocket();
         this.ws.addEventListener(egret.ProgressEvent.SOCKET_DATA, this.onSocketData, this);
@@ -264,6 +279,24 @@ var WeixinPlatform = (function (_super) {
             }
             else if (parsed.type === "game_balance") {
                 this.getGameResult(parsed.id);
+            }
+            else if (parsed.type === "game_user_betting") {
+                var chipTypeMap2 = {
+                    0: 1000,
+                    1: 5000,
+                    2: 10000,
+                    3: 100000,
+                    4: 500000,
+                    5: 1000000
+                };
+                var evt = new RemoteEvent(RemoteEvent.BET);
+                evt.data = {
+                    gameId: parsed.game_id,
+                    amount: chipTypeMap2[parsed.chip_type],
+                    playerIdx: parsed.betting_type + 1,
+                    isFromOther: true
+                };
+                this.dispatchEvent(evt);
             }
         }
         catch (e) {
@@ -357,4 +390,3 @@ __reflect(WeixinPlatform.prototype, "WeixinPlatform", ["Platform"]);
 if (!window.platform) {
     window.platform = new WeixinPlatform();
 }
-//# sourceMappingURL=Platform.js.map

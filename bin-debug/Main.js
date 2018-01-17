@@ -72,14 +72,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 var app = null;
-egret.lifecycle.onPause = function () {
-    console.log("app 进入后台");
-    egret.ticker.pause(); // 关闭渲染与心跳
-};
-egret.lifecycle.onResume = function () {
-    console.log("app 进入前台");
-    egret.ticker.resume(); // 打开渲染与心跳
-};
 var Main = (function (_super) {
     __extends(Main, _super);
     function Main() {
@@ -96,10 +88,10 @@ var Main = (function (_super) {
             };
         });
         egret.lifecycle.onPause = function () {
-            egret.ticker.pause();
+            // egret.ticker.pause();
         };
         egret.lifecycle.onResume = function () {
-            egret.ticker.resume();
+            // egret.ticker.resume();
         };
         this.runGame().catch(function (e) {
             console.log(e);
@@ -107,6 +99,7 @@ var Main = (function (_super) {
     };
     Main.prototype.runGame = function () {
         return __awaiter(this, void 0, void 0, function () {
+            var _this = this;
             var gameConfig, gameState;
             return __generator(this, function (_a) {
                 switch (_a.label) {
@@ -132,6 +125,7 @@ var Main = (function (_super) {
                         platform.getUserMoney().then(function (result) {
                             app.mainBoard.setMoney(result.num);
                             app.mainBoard.setScore(result.user_total_betting_num);
+                            _this.game.coin_num = result.num;
                         });
                         platform.getDealerMoney(gameState.id).then(function (result) {
                             app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");
@@ -239,6 +233,8 @@ var Main = (function (_super) {
         this.addChild(bg);
     };
     Main.prototype.playEffectSound = function (resource) {
+        if (!this.bgmEnabled)
+            return;
         if (typeof resource === "string") {
             var sound = RES.getRes(resource);
             this.effectChannel = sound.play(0, 1);
@@ -272,17 +268,19 @@ var Main = (function (_super) {
      * 申请下庄
      */
     Main.prototype.bePlayer = function () {
+        platform.applyPlayer();
     };
     /**
      * 下注
      */
     Main.prototype.postBet = function (playerIdx, amount) {
-        // TODO 下注接口
         if (!this.game.currentPhase)
             return;
         if (this.game.currentPhase.type !== PhaseType.Betting)
             return;
         if (this.game.no_betting_time * 1000 <= +new Date)
+            return;
+        if (this.game.is_banker)
             return;
         platform.bet(this.game.gameId, amount, playerIdx);
     };
@@ -291,7 +289,9 @@ var Main = (function (_super) {
      */
     Main.prototype.onRemoteBet = function (e) {
         var data = e.data;
-        this.mainBoard.showBetAnimation(data.amount, data.playerIdx);
+        if (data.gameId !== this.game.gameId)
+            return;
+        this.mainBoard.showBetAnimation(data.amount, data.playerIdx, data.isFromOther);
     };
     Main.prototype.onRemoteGameCreated = function (e) {
         this.game.nextNewGame = e.data;
@@ -340,4 +340,3 @@ var Main = (function (_super) {
     return Main;
 }(egret.DisplayObjectContainer));
 __reflect(Main.prototype, "Main");
-//# sourceMappingURL=Main.js.map

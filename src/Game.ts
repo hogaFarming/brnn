@@ -157,9 +157,7 @@ class Game extends egret.Sprite {
         });
         this.initCardPackage();
         this.dispatchDecisionCard();
-        let timerToDispatchCards = new egret.Timer(Game.TimeAfterDecision, 1);
-        timerToDispatchCards.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.startDispatchCards, this);
-        timerToDispatchCards.start();
+        setTimeout(this.startDispatchCards.bind(this), Game.TimeAfterDecision);
     }
 
     startDispatchCards(): void {
@@ -167,10 +165,7 @@ class Game extends egret.Sprite {
         try {
             this.removeChild(this.decisionCard);
         } catch (e) {};
-        let timer = new egret.Timer(Game.DispatchInterval, 24);
-        timer.addEventListener(egret.TimerEvent.TIMER, this.dispatchNextCard, this);
-        timer.addEventListener(egret.TimerEvent.TIMER_COMPLETE, this.onDispatchCardsComplete, this);
-        timer.start();
+        new Timer(this.dispatchNextCard.bind(this), this.onDispatchCardsComplete.bind(this), Game.DispatchInterval, 24);
 
         this.dispatchNextCard();
     }
@@ -236,6 +231,8 @@ class Game extends egret.Sprite {
             console.log("set game state status:" + stateData.status);
             this.gameStateData = stateData;
             app.mainBoard.setDealerType(stateData.banker_username || "");
+            this.is_banker = stateData.is_banker;
+            app.mainBoard.setBeDealerBtn(this.is_banker === 1);
         }
     }
 
@@ -243,15 +240,13 @@ class Game extends egret.Sprite {
         this.currentPhase = phase;
         if (this.currentPhase.countDown < 0) this.currentPhase.countDown = 0;
         if (this.currentPhase.countDown) {
-            let timer = this.timer = new egret.Timer(1000, this.currentPhase.countDown);
-            timer.addEventListener(egret.TimerEvent.TIMER, this.onCountDown, this);
-            timer.start();
+            new Timer(this.onCountDown.bind(this), () => {}, 1000, this.currentPhase.countDown);
         }
         this.onCountDown();
     }
 
     onCountDown() {
-        console.log("count down " + this.currentPhase.countDown);
+        // console.log("count down " + this.currentPhase.countDown);
         if (this.currentPhase.countDown > 0) {
             this.currentPhase.countDown -= 1;
         } else {
@@ -376,9 +371,8 @@ class Game extends egret.Sprite {
     }
 
     startLookCard(): void {
-        let timer = new egret.Timer(2000, 5);
         let idx = 1;
-        timer.addEventListener(egret.TimerEvent.TIMER, () => {
+        new Timer(() => {
             let playerIdx = idx >= 5 ? 0 : idx;
             let cards = this.getPlayerCards(playerIdx);
             let card = cards[cards.length - 1];
@@ -386,8 +380,7 @@ class Game extends egret.Sprite {
                 this.showPlayerResult(playerIdx);
             });
             idx += 1;
-        }, this);
-        timer.start();
+        }, () => {}, 2000, 5);
     }
 
     showPlayerResult(playerIdx: number, playSound: boolean = true) {
@@ -446,7 +439,7 @@ class Game extends egret.Sprite {
             "牛7": "brnn_cards.Calf1_08",
             "牛8": "brnn_cards.Calf1_09",
             "牛9": "brnn_cards.Calf1_10",
-            "牛牛": "brnn_env.Calf1_11"
+            "牛牛": "brnn_cards.Calf1_11"
         };
         return new egret.Bitmap(utils.getRes(msgMap[msg]));
     }
@@ -520,6 +513,7 @@ class Game extends egret.Sprite {
             platform.getUserMoney().then(result => {
                 app.mainBoard.setMoney(result.num);
                 app.mainBoard.setScore(result.user_total_betting_num);
+                this.coin_num = result.num;
             });
             platform.getDealerMoney(this.nextNewGame.game_id).then(result => {
                 app.mainBoard.setDealerMoney(result.banker_total_coin_num || "--");

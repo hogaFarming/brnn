@@ -45,7 +45,7 @@ var DealerListWindow = (function (_super) {
     DealerListWindow.prototype.render = function () {
         this.spDealerList.removeChildren();
         var text = this.dealerList.map(function (item) {
-            return item.apply_name;
+            return item.apply_name + "（" + item.banker_coin + "）";
         }).join("，");
         var txt = new egret.TextField();
         txt.width = 540;
@@ -69,4 +69,3 @@ var DealerListWindow = (function (_super) {
     return DealerListWindow;
 }(egret.Sprite));
 __reflect(DealerListWindow.prototype, "DealerListWindow", ["ModalLifeCycle"]);
-//# sourceMappingURL=DealerListModal.js.map

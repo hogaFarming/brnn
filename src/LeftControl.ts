@@ -40,7 +40,7 @@ class LeftControl extends egret.Sprite {
         this.addPanelBtn(ButtonModels.BackButton, this.onClickBackBtn, 12, 18);
         this.soundBtn = this.addPanelBtn(ButtonModels.SoundButtonA, this.handleClickSoundBtn, 73, 118);
         this.soundDisabledBtn = this.addPanelBtn(ButtonModels.SoundButtonB, this.handleClickSoundBtn, 73, 118);
-        this.addPanelBtn(ButtonModels.HelpButton, this.onClickBackBtn, 12, 212);
+        this.addPanelBtn(ButtonModels.HelpButton, this.onClickHelpBtn, 12, 212);
         if (app.bgmEnabled) {
             this.panel.removeChild(this.soundDisabledBtn);
         } else {
@@ -69,7 +69,14 @@ class LeftControl extends egret.Sprite {
     }
 
     private onClickBackBtn(): void {
-        console.log("click panel btn");
+        if (history.length > 1) {
+            history.back();
+        } else {
+            window.close();
+        }
+    }
+
+    private onClickHelpBtn(): void {
         app.modalManager.openHelpModal();
     }
 

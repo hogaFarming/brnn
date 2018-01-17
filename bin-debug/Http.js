@@ -155,4 +155,3 @@ var Http = (function () {
 }());
 __reflect(Http.prototype, "Http");
 var http = new Http();
-//# sourceMappingURL=Http.js.map

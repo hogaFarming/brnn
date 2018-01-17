@@ -38,4 +38,3 @@ var ModalManager = (function (_super) {
     return ModalManager;
 }(egret.Sprite));
 __reflect(ModalManager.prototype, "ModalManager");
-//# sourceMappingURL=ModalManager.js.map

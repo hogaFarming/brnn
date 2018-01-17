@@ -50,4 +50,3 @@ var Modal = (function (_super) {
     return Modal;
 }(egret.Sprite));
 __reflect(Modal.prototype, "Modal");
-//# sourceMappingURL=Modal.js.map
