@@ -102,7 +102,12 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
     }
 
     public onOpen(): boolean {
-        this.render();
+        if (app.game.gameId) {
+            platform.getHistory(app.game.gameId).then(result => {
+                this.recordsData = result.list;
+                this.render();
+            });
+        }
         return true;
     }
     public onClose(): boolean {

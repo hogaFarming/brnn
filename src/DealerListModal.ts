@@ -1,8 +1,11 @@
-const BeDealerMinLimit = 50000000;
-const AreaLimit = 200000000;
-const PersonLimit = 20000000;
+const BeDealerMinLimit = 300000;
+const AreaLimit = 2000000;
+const PersonLimit = 200000;
 
 class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
+
+    private dealerList: Array<any> = [];
+    private spDealerList: egret.Sprite;
 
     constructor() {
         super();
@@ -19,6 +22,8 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
         this.addTxt(BeDealerMinLimit + "", 62, 358);
         this.addTxt(AreaLimit + "", 250, 358);
         this.addTxt(PersonLimit + "", 452, 358);
+
+        this.spDealerList = new egret.Sprite();
     }
 
     private addTxt(text: string, x: number, y: number): void {
@@ -32,11 +37,25 @@ class DealerListWindow extends egret.Sprite implements ModalLifeCycle {
     }
 
     private render(): void {
-        
+        this.spDealerList.removeChildren();
+        let text = this.dealerList.map(item => {
+            return item.apply_name;
+        }).join("， ");
+        let txt = new egret.TextField();
+        txt.x = 0;
+        txt.y = 0;
+        txt.width = this.width - 20;
+        txt.height = this.height - 40;
+        txt.text = text;
+        txt.textColor = 0xffffff;
+        this.spDealerList.addChild(txt);
     }
 
     public onOpen(): boolean {
-        this.render();
+        platform.getDealerList().then(result => {
+            this.dealerList = result.list;
+            this.render();
+        });
         return true;
     }
     public onClose(): boolean {

@@ -24,6 +24,8 @@ interface GameStateData {
     id: number; // 牌局id
     status: number; // 0 投注中，1 开奖中，2 已结算
     banker_type: number; // 用户/系统上庄
+    banker_username: string;
+    is_banker: number; // 当前用户是否上庄
     no_betting_time: number; // 截止投注时间
     lottery_time: number; // 开奖开始时间
     balance_time: number; // 结算时间
@@ -60,6 +62,8 @@ class Game extends egret.Sprite {
     public currentPhase: Phase;
     public no_betting_time: number; // 截止下注时间
     public coin_num: number = 0; // 余额
+    public is_banker: number = 0;
+    public banker_username: string = "";
     private cardPackage: Array<Card>;
     private decisionCard: Card; // 抽牌牌面
     private startIndex: number = 0; // 从哪个玩家开始发牌
@@ -231,9 +235,7 @@ class Game extends egret.Sprite {
         } else {
             console.log("set game state status:" + stateData.status);
             this.gameStateData = stateData;
-            if (stateData.banker_type !== undefined) {
-                app.mainBoard.setDealerType(stateData.banker_type === 0 ? "系统上庄" : "玩家上庄");
-            }
+            app.mainBoard.setDealerType(stateData.banker_username || "");
         }
     }
 

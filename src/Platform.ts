@@ -8,6 +8,8 @@ declare interface Platform extends egret.EventDispatcher {
 
     getGameConfig(): Promise<any>;
 
+    getGameMoney(): Promise<any>;
+
     getGameState(): Promise<any>;
 
     getGameResult(gameId: number): Promise<any>;
@@ -15,6 +17,10 @@ declare interface Platform extends egret.EventDispatcher {
     bet(gameId: number, amount: number, playerIdx: number): Promise<any>;
 
     getHistory(gameId: number): Promise<any>;
+
+    getDealerList(): Promise<any>;
+
+    applyDealer(): Promise<any>;
 
     login(): Promise<any>
 
@@ -49,6 +55,12 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
         let config = res.data.config;
         this.connectSocket(config.ip, config.port);
         return res.data;
+    }
+
+    async getGameMoney() {
+        let res = await http.get("/api/gameinfo_niuniu");
+        let config = res.data.config;
+        return res.data.coin_num;
     }
 
     async getGameState() {
@@ -94,7 +106,7 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     async getHistory(gameId) {
         let res = await http.get("/api/game_history", { params: { id: gameId } });
-        return res.data;
+        return res.list;
     }
 
     async login() {
@@ -103,6 +115,15 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
         } else {
             await this._login();
         }
+    }
+
+    async getDealerList() {
+        let res = await http.get("/api/banker_list");
+        return res.list;
+    }
+
+    async applyDealer() {
+        let res = await http.get("api/banker_apply");
     }
 
     connectSocket(address: string, port: number) {

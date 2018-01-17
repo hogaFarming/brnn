@@ -173,8 +173,15 @@ class Main extends egret.DisplayObjectContainer {
     /**
      * 申请上庄
      */
-    public beDealer() {
-        new Dialog("您的余额不足，无法上庄！");
+    public async beDealer() {
+        if (this.game.coin_num < BeDealerMinLimit) {
+            new Dialog("您的余额不足，无法上庄！");
+            return;
+        }
+        let result = await platform.applyDealer();
+        // if (result) {
+
+        // }
     }
 
     /**
