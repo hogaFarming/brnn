@@ -62,7 +62,8 @@ let utils = {
         let num = Math.floor(Math.random() * diff);
         return min + num;
     },
-    unixTimeToDate(unixTime: number): Date {
-        return new Date(unixTime * 1000);
+    unixTime(unixTime: number): string {
+        let date = new Date(unixTime * 1000);
+        return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
     }
 };

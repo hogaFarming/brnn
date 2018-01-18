@@ -32,3 +32,4 @@ var Timer = (function () {
     return Timer;
 }());
 __reflect(Timer.prototype, "Timer");
+//# sourceMappingURL=Timer.js.map

@@ -10,8 +10,8 @@
 		"libs/modules/promise/promise.js"
 	],
 	"game": [
+		"bin-debug/AppEvent.js",
 		"bin-debug/AppLoading.js",
-		"bin-debug/Http.js",
 		"bin-debug/Button.js",
 		"bin-debug/ButtonFactory.js",
 		"bin-debug/Card.js",
@@ -21,7 +21,7 @@
 		"bin-debug/Game.js",
 		"bin-debug/HelpWindow.js",
 		"bin-debug/HistoryWindow.js",
-		"bin-debug/AppEvent.js",
+		"bin-debug/Http.js",
 		"bin-debug/LeftControl.js",
 		"bin-debug/LoadingUI.js",
 		"bin-debug/Main.js",

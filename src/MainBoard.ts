@@ -1,6 +1,10 @@
 /**
  * 游戏主面板
  */
+
+const Max_Bet_Percent = 0.2;
+const Max_Bet_Num = 300000;
+
 class MainBoard extends egret.DisplayObjectContainer {
 
     private txtMoney: egret.TextField; // 余额
@@ -62,17 +66,19 @@ class MainBoard extends egret.DisplayObjectContainer {
     }
 
     public setBeDealerBtn(isDealder: boolean) {
-        if (isDealder) {
-            this.btnBeDealer.visible = false;
-            this.btnBePlayer.visible = true;
-        } else {
-            this.btnBeDealer.visible = true;
-            this.btnBePlayer.visible = false;
-        }
+        // 去掉上庄
+        // if (isDealder) {
+        //     this.btnBeDealer.visible = false;
+        //     this.btnBePlayer.visible = true;
+        // } else {
+        //     this.btnBeDealer.visible = true;
+        //     this.btnBePlayer.visible = false;
+        // }
     }
 
     private addSprites(): void {
-        this.addBitmap("brnn_env.DealerInformation", 21, 28);
+        // 去掉上庄
+        // this.addBitmap("brnn_env.DealerInformation", 21, 28);
         this.addBitmap("brnn_env.timeBg", (1280 - 225) / 2, 7);
 
         this.txtMoney = this.createInfoText("0", 98, 605);
@@ -80,13 +86,19 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.txtBetting = this.createInfoText("0", 98, 677);
 
         this.txtDealerType = this.createInfoText("", 120, 39);
+        this.txtDealerType.visible = false;
         this.txtDealerMoney = this.createInfoText("--", 120, 75);
+        this.txtDealerMoney.visible = false;
         this.txtDealerScore = this.createInfoText("0", 120, 111);
+        this.txtDealerScore.visible = false;
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
+        this.txtDealerRounds.visible = false;
 
         this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.showHistory, 263, 610);
         this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.showDealerList, 955, 610);
+        this.btnDealerList.visible = false;
         this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.handleBeDealer, 1120, 610);
+        this.btnBeDealer.visible = false;
         this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
 
@@ -183,6 +195,16 @@ class MainBoard extends egret.DisplayObjectContainer {
         // TODO 限制下注时间
         if (this.chipIdx === undefined) return;
         let amount = this.chips[this.chipIdx].value;
+
+        let currBet = this.currBettings[index];
+        if ((currBet + amount > app.game.coin_num * Max_Bet_Percent) || (currBet + amount > Max_Bet_Num)) {
+            new Dialog("超出目前最大下注限制");
+            return;
+        }
+        if (amount > app.game.coin_num) {
+            new Dialog("目前余额不足");
+            return;
+        }
         app.postBet(index, amount);
         // this.showBetAnimation(amount, index);
     }

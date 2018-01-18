@@ -78,3 +78,4 @@ var Chip = (function (_super) {
     return Chip;
 }(egret.Sprite));
 __reflect(Chip.prototype, "Chip");
+//# sourceMappingURL=Chip.js.map

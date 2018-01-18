@@ -69,3 +69,4 @@ var DealerListWindow = (function (_super) {
     return DealerListWindow;
 }(egret.Sprite));
 __reflect(DealerListWindow.prototype, "DealerListWindow", ["ModalLifeCycle"]);
+//# sourceMappingURL=DealerListModal.js.map

@@ -136,17 +136,13 @@ class Card extends egret.Sprite {
         let deltaY = (this.finalPositon.y - Card.StartPos.y) / Card.Speed * pass;
         this.currPosition.x += deltaX;
         this.currPosition.y += deltaY;
-        // console.log("pass " + pass + ", position.x: " + this.finalPositon.x + "startPos.x: " + Card.StartPos.x + ", speed: " + Card.Speed);
-        // console.log("deltaX: " + deltaX + ", deltaY: " + deltaY + ", " + "currPosition: {x: " + this.currPosition.x + ", y: " + this.currPosition.y + "}");
-
+        
         // 计算旋转角度
         let totalRotation = Card.RotateRounds * 360;
         let rotation = totalRotation / Card.Speed * pass;
         this.rotation += rotation;
-        // console.log("rotation: " + this.rotation);
 
         if (this.currPosition.y >= this.finalPositon.y) {
-            console.log("complete dispatch");
             this.currPosition.x = this.finalPositon.x;
             this.currPosition.y = this.finalPositon.y;
             this.rotation = 0;
@@ -166,7 +162,6 @@ class Card extends egret.Sprite {
     private onLookCardFrame() {
         this.spLookCard.removeChildren();
         let lookCardFrame = this.lookCardFrames[this.lookCardFrameIdx ++];
-        // console.log("lookCardFrame " + lookCardFrame);
         if (!lookCardFrame) {
             this.onLookCardComplete();
         } else {
@@ -180,7 +175,6 @@ class Card extends egret.Sprite {
     }
 
     private onLookCardComplete() {
-        console.log("lookcard complete")
         this.state = CardState.Shown;
         this.render();
         if (this.lookCardCallBack) {

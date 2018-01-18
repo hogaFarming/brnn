@@ -21,3 +21,4 @@ var AppEvent = (function (_super) {
     return AppEvent;
 }(egret.Event));
 __reflect(AppEvent.prototype, "AppEvent");
+//# sourceMappingURL=AppEvent.js.map

@@ -98,3 +98,4 @@ var LeftControl = (function (_super) {
     return LeftControl;
 }(egret.Sprite));
 __reflect(LeftControl.prototype, "LeftControl");
+//# sourceMappingURL=LeftControl.js.map

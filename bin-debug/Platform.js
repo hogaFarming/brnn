@@ -105,13 +105,26 @@ var WeixinPlatform = (function (_super) {
     };
     WeixinPlatform.prototype.getGameState = function () {
         return __awaiter(this, void 0, void 0, function () {
-            var res;
+            var res, data, client_now_time, diff, lottery_time;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0: return [4 /*yield*/, http.get("/api/game_info_now")];
                     case 1:
                         res = _a.sent();
-                        return [2 /*return*/, res.data];
+                        data = res.data;
+                        if (data.now_time && data.lottery_time) {
+                            client_now_time = Math.round(+new Date() / 1000);
+                            diff = client_now_time - data.now_time;
+                            data.lottery_time += diff;
+                            data.no_betting_time && (data.no_betting_time += diff);
+                            if (data.next_game_info) {
+                                lottery_time = data.next_game_info.lottery_time;
+                                data.next_game_info.lottery_time += diff;
+                                data.next_game_info.no_betting_time += diff;
+                                console.log("\u4E0B\u4E00\u5C40\u6E38\u620F\u5F00\u5956\u65F6\u95F4\uFF1A(" + (data.next_game_info.lottery_time - client_now_time) + "\u79D2\u540E) \u672C\u5730(" + utils.unixTime(data.next_game_info.lottery_time) + ")\uFF0C\u670D\u52A1(" + utils.unixTime(lottery_time) + ")\u3002\n                    \u5F53\u524D\u670D\u52A1\u5668\u65F6\u95F4(" + utils.unixTime(data.now_time) + ")\uFF0C\n                    \u5F53\u524D\u5BA2\u6237\u7AEF\u65F6\u95F4(" + utils.unixTime(client_now_time) + ")\uFF0C\n                    \u6821\u51C6\u503C\u4E3A" + diff + "\u79D2\n                    ");
+                            }
+                        }
+                        return [2 /*return*/, data];
                 }
             });
         });
@@ -121,9 +134,7 @@ var WeixinPlatform = (function (_super) {
             var res, evt;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0:
-                        console.log("get game result... ");
-                        return [4 /*yield*/, http.get("/api/game_result", { params: { id: gameId } })];
+                    case 0: return [4 /*yield*/, http.get("/api/game_result", { params: { id: gameId } })];
                     case 1:
                         res = _a.sent();
                         if (res.data.status === 0)
@@ -253,9 +264,7 @@ var WeixinPlatform = (function (_super) {
         this.ws.connect(address, port);
     };
     WeixinPlatform.prototype.onSocketOpen = function () {
-        var cmd = "Hello Egret WebSocket";
-        console.log("连接成功，发送数据：" + cmd);
-        // this.ws.writeUTF(cmd);
+        console.log("Egret WebSocket 连接成功");
     };
     WeixinPlatform.prototype.onSocketData = function (e) {
         var msg = this.ws.readUTF();
@@ -267,11 +276,14 @@ var WeixinPlatform = (function (_super) {
             }
             else if (parsed.type === "game_create") {
                 var evt = new RemoteEvent(RemoteEvent.GAME_CREATE);
+                var client_now_time = Math.round(+new Date() / 1000);
+                var diff = client_now_time - parsed.now_time;
                 evt.data = {
                     game_id: parsed.game_id,
-                    lottery_time: parsed.lottery_time,
-                    no_betting_time: parsed.no_betting_time
+                    lottery_time: parsed.lottery_time + diff,
+                    no_betting_time: parsed.no_betting_time + diff
                 };
+                console.log("\u4E0B\u4E00\u5C40\u6E38\u620F\u5F00\u5956\u65F6\u95F4\uFF1A(" + (evt.data.lottery_time - client_now_time) + "\u79D2\u540E) \u672C\u5730(" + utils.unixTime(evt.data.lottery_time) + ")\uFF0C\u670D\u52A1(" + utils.unixTime(parsed.lottery_time) + ")\u3002\n                    \u5F53\u524D\u670D\u52A1\u5668\u65F6\u95F4(" + utils.unixTime(parsed.now_time) + ")\uFF0C\n                    \u5F53\u524D\u5BA2\u6237\u7AEF\u65F6\u95F4(" + utils.unixTime(client_now_time) + ")\uFF0C\n                    \u6821\u51C6\u503C\u4E3A" + diff + "\u79D2\n                    ");
                 this.dispatchEvent(evt);
             }
             else if (parsed.type === "game_result") {
@@ -390,3 +402,4 @@ __reflect(WeixinPlatform.prototype, "WeixinPlatform", ["Platform"]);
 if (!window.platform) {
     window.platform = new WeixinPlatform();
 }
+//# sourceMappingURL=Platform.js.map

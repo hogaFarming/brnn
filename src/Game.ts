@@ -1,18 +1,23 @@
 enum PhaseType {
     Free,
     Betting,
-    Lottery
+    Lottery,
+    Dispatch,
+    Result
 }
 
 const PhaseTitle = {
     0: "休闲时间",
     1: "投注时间",
-    2: "开奖时间"
+    2: "开奖时间",
+    3: "发牌时间",
+    4: "结算时间"
 };
 
 interface Phase {
     type: PhaseType;
     countDown: number;
+    restForResult?: number;
 }
 
 interface CardResult {
@@ -29,6 +34,7 @@ interface GameStateData {
     no_betting_time: number; // 截止投注时间
     lottery_time: number; // 开奖开始时间
     balance_time: number; // 结算时间
+    now_time: number;
     game_detail_banker: CardResult; // 牌面结果
     game_result_a: CardResult;
     game_result_b: CardResult;
@@ -49,13 +55,16 @@ interface GameStateData {
     betting_b: number;
     betting_c: number;
     betting_d: number;
-    next_game_info: Object;
+    next_game_info: any;
 }
+
+const TimeForBetting = 15;
+const TimeForDispatchCards = 15;
 
 class Game extends egret.Sprite {
 
     static TimeAfterDecision = 1000; // 抽牌后多久开始发牌
-    static DispatchInterval = 100; // 发牌时间间隔（速度）
+    static DispatchInterval = 90; // 发牌时间间隔（速度）
 
     public gameId: number;
     public gameStateData: GameStateData; // 游戏状态数据（来自服务端）
@@ -94,16 +103,25 @@ class Game extends egret.Sprite {
             if (stateData.no_betting_time * 1000 < +new Date) {
                 app.showWaitTip();
             }
-            this.initCurrentPhase();
+            let now = Math.round(+new Date / 1000);
+            let secondsToLottery = this.gameStateData.lottery_time - now;
+            this.no_betting_time = this.gameStateData.no_betting_time;
+            this.setCurrentPhase({
+                type: PhaseType.Betting,
+                countDown: secondsToLottery
+            });
         } else {
             this.nextNewGame = stateData.next_game_info;
-            if (stateData.status === 1) {
-                let secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
-                this.startLottery(secondsForLottery);
-            } else if (stateData.status === 2) {
+            let secondsForLottery = Math.round(this.nextNewGame.lottery_time - TimeForBetting - (+new Date / 1000));
+            if (secondsForLottery > TimeForDispatchCards + 3) {
+                this.startLottery();
+            } else {
                 // 显示牌面，并显示结算结果
                 this.initCardPackage();
-                this.initCurrentPhase();
+                this.setCurrentPhase({
+                    type: PhaseType.Result,
+                    countDown: secondsForLottery
+                })
                 this.startDispatchCardsImmediately();
             }
         }
@@ -113,55 +131,142 @@ class Game extends egret.Sprite {
      * 投注过程或开奖过程中，获取到了牌面/结算结果
      */
     receivedGameStateData(stateData: GameStateData): void {
-        // console.log("this.currentPhase.type === PhaseType.Betting && this.currentPhase.countDown <= 0 => " + (this.currentPhase.type === PhaseType.Betting && this.currentPhase.countDown <= 0));
-        // console.log("this.currentPhase.type === PhaseType.Lottery => " + (this.currentPhase.type === PhaseType.Lottery));
         if (this.currentPhase.type === PhaseType.Betting) {
             this.setGameStateData(stateData);
             if (this.currentPhase.countDown <= 0) {
-                let lottery_time = this.nextNewGame ? this.nextNewGame.lottery_time : (stateData.lottery_time + 50);
-                let secondsForLottery = Math.ceil(lottery_time - 20 - (+new Date / 1000));
-                
-                if (secondsForLottery < 0) secondsForLottery += 51;
-                this.startLottery(secondsForLottery);
+                this.startLottery();
             }
-        } else if (this.currentPhase.type === PhaseType.Lottery) {
+        } else {
             this.setGameStateData(stateData);
-            if (stateData.status === 2 && this.currentPhase.countDown === 0) {
-                this.showGameResult();
-            }
         }
     }
 
     createNewGame(gameId: number, no_betting_time: number, lottery_time: number) {
-        console.log(`create new game: ${gameId}, no_betting_time: ${new Date(no_betting_time * 1000)}, lottery_time: ${new Date(lottery_time * 1000)}`);
+        console.log(`create new game: ${gameId}, no_betting_time: ${utils.unixTime(no_betting_time)}, lottery_time: ${utils.unixTime(lottery_time)}`);
         this.setGameStateData(null);
         this.gameId = gameId;
         this.clear();
         app.mainBoard.clearBetChips();
-        let now = Math.floor(+new Date / 1000);
+        let now = Math.round(+new Date / 1000);
         let secondsToLottery = lottery_time - now;
         this.no_betting_time = no_betting_time;
-        console.log("countdown seconds: " + secondsToLottery);
         this.setCurrentPhase({
             type: PhaseType.Betting,
             countDown: secondsToLottery
         });
     }
 
-    startLottery(countDown?: number): void {
-        if (this.currentPhase.type === PhaseType.Lottery) return;
-        console.log("开奖，countdown" + countDown);
+    startLottery(): void {
         this.setCurrentPhase({
-            type: PhaseType.Lottery,
-            countDown: countDown || 25
+            type: PhaseType.Dispatch,
+            countDown: TimeForDispatchCards
         });
         this.initCardPackage();
         this.dispatchDecisionCard();
         setTimeout(this.startDispatchCards.bind(this), Game.TimeAfterDecision);
+        return;
+
+        // let secondsForLottery;
+        // if (this.nextNewGame) {
+        //     secondsForLottery = Math.round(this.nextNewGame.lottery_time - TimeForBetting - (+new Date / 1000));
+        //     console.log("has next new game data, secondsForLottery " + secondsForLottery);
+        // } else {
+        //     secondsForLottery = Math.round(this.gameStateData.lottery_time + 42 - TimeForBetting - (+new Date / 1000));
+        //     console.log("no next new game data, secondsForLottery " + secondsForLottery);
+        // }
+        // console.log("开始开奖：" + utils.unixTime(+new Date / 1000));
+        // console.log("剩余开奖时间" + secondsForLottery + "秒");
+        // if (secondsForLottery > TimeForDispatchCards + 3) {
+        //     this.setCurrentPhase({
+        //         type: PhaseType.Dispatch,
+        //         countDown: TimeForDispatchCards,
+        //         restForResult: secondsForLottery - TimeForDispatchCards
+        //     });
+        //     this.initCardPackage();
+        //     this.dispatchDecisionCard();
+        //     setTimeout(this.startDispatchCards.bind(this), Game.TimeAfterDecision);
+        // } else {
+        //     // 显示牌面，并显示结算结果
+        //     this.initCardPackage();
+        //     this.setCurrentPhase({
+        //         type: PhaseType.Result,
+        //         countDown: secondsForLottery
+        //     })
+        //     this.startDispatchCardsImmediately();
+        // }
+    }
+
+    setGameStateData(stateData: GameStateData) {
+        if (stateData === null) {
+            console.log("set game state " + stateData);
+            this.gameStateData = null;
+        } else {
+            console.log("set game state status:" + stateData.status);
+            this.gameStateData = stateData;
+            app.mainBoard.setDealerType(stateData.banker_username || "");
+            this.is_banker = stateData.is_banker;
+            app.mainBoard.setBeDealerBtn(this.is_banker === 1);
+        }
+    }
+
+    setCurrentPhase(phase: Phase) {
+        this.currentPhase = phase;
+        if (this.currentPhase.restForResult) {
+            console.log("预计结算时间" + this.currentPhase.restForResult);
+        }
+        if (this.currentPhase.countDown < 0) this.currentPhase.countDown = 0;
+        if (this.currentPhase.countDown) {
+            new Timer(this.onCountDown.bind(this), () => {}, 1000, this.currentPhase.countDown);
+        }
+        this.onCountDown();
+    }
+
+    onCountDown() {
+        if (this.currentPhase.countDown > 0) {
+            this.currentPhase.countDown -= 1;
+        } else {
+            this.currentPhase.countDown = 0;
+            if (this.currentPhase.type === PhaseType.Betting && this.gameStateData && this.gameStateData.status > 0) {
+                this.startLottery();
+            } else if (this.currentPhase.type === PhaseType.Dispatch) {
+                this.setCurrentPhase({
+                    type: PhaseType.Result,
+                    countDown: Math.round(this.nextNewGame.lottery_time - TimeForBetting - (+new Date / 1000))
+                });
+                this.showGameResult();
+            } else if (this.currentPhase.type === PhaseType.Result) {
+                this.createNewGame(this.nextNewGame.game_id, this.nextNewGame.no_betting_time, this.nextNewGame.lottery_time);
+            }
+        }
+        if (!this.txtPhase) {
+            this.txtPhase = new egret.TextField();
+            this.txtPhase.textColor = 0xe7cf6e;
+            this.txtPhase.size = 24;
+            this.txtPhase.x = 560;
+            this.txtPhase.y = 40;
+
+            this.txtCountDown = new egret.TextField();
+            this.txtCountDown.textColor = 0xe7cf6e;
+            this.txtCountDown.size = 24;
+            this.txtCountDown.x = 692;
+            this.txtCountDown.y = 40;
+            this.txtCountDown.width = 42;
+            this.txtCountDown.textAlign = "center";
+        } else {
+            try {
+                this.removeChild(this.txtPhase);
+                this.removeChild(this.txtCountDown);
+            } catch (e) {
+
+            }
+        }
+        this.txtPhase.text = PhaseTitle[this.currentPhase.type];
+        this.txtCountDown.text = this.currentPhase.countDown + "";
+        this.addChildAt(this.txtPhase, 0);
+        this.addChildAt(this.txtCountDown, 0);
     }
 
     startDispatchCards(): void {
-        console.log("开始发牌..");
         try {
             this.removeChild(this.decisionCard);
         } catch (e) {};
@@ -191,108 +296,6 @@ class Game extends egret.Sprite {
         while (count --) {
             this.cardPackage.push(new Card(CardType.方块, 5));
         }
-    }
-
-    // 初始化当前阶段
-    initCurrentPhase(): void {
-        if (this.gameStateData.status === 0) {
-            let now = Math.floor(+new Date / 1000);
-            let secondsToLottery = this.gameStateData.lottery_time - now;
-            this.no_betting_time = this.gameStateData.no_betting_time;
-            this.setCurrentPhase({
-                type: PhaseType.Betting,
-                countDown: secondsToLottery
-            })
-        } else {
-            let secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
-            this.setCurrentPhase({
-                type: PhaseType.Lottery,
-                countDown: secondsForLottery
-            });
-            // if (this.gameStateData.status === 1) {
-            //     this.setCurrentPhase({
-            //         type: PhaseType.Lottery,
-            //         countDown: secondsForLottery
-            //     })
-            // } else if (this.gameStateData.status === 2) {
-            //     this.setCurrentPhase({
-            //         type: PhaseType.Lottery,
-            //         countDown: secondsForLottery
-            //     })
-            // }
-        }
-    }
-
-    setGameStateData(stateData: GameStateData) {
-        if (stateData === null) {
-            console.log("set game state " + stateData);
-            this.gameStateData = null;
-        } else {
-            console.log("set game state status:" + stateData.status);
-            this.gameStateData = stateData;
-            app.mainBoard.setDealerType(stateData.banker_username || "");
-            this.is_banker = stateData.is_banker;
-            app.mainBoard.setBeDealerBtn(this.is_banker === 1);
-        }
-    }
-
-    setCurrentPhase(phase: Phase) {
-        this.currentPhase = phase;
-        if (this.currentPhase.countDown < 0) this.currentPhase.countDown = 0;
-        if (this.currentPhase.countDown) {
-            new Timer(this.onCountDown.bind(this), () => {}, 1000, this.currentPhase.countDown);
-        }
-        this.onCountDown();
-    }
-
-    onCountDown() {
-        // console.log("count down " + this.currentPhase.countDown);
-        if (this.currentPhase.countDown > 0) {
-            this.currentPhase.countDown -= 1;
-        } else {
-            this.currentPhase.countDown = 0;
-
-            if (this.currentPhase.type === PhaseType.Betting && this.gameStateData && this.gameStateData.status > 0) {
-                // let lottery_time = this.nextNewGame ? this.nextNewGame.lottery_time : (this.gameStateData.lottery_time + 50);
-                // if (!this.nextNewGame) {
-                //     console.log("no next new game")
-                // }
-                let secondsForLottery = Math.ceil(this.nextNewGame.lottery_time - 20 - (+new Date / 1000));
-                // if (secondsForLottery < 0) debugger;
-                this.startLottery(secondsForLottery);
-            } else if (this.currentPhase.type === PhaseType.Lottery) {
-                // if (this.nextNewGame) {
-                    this.createNewGame(this.nextNewGame.game_id, this.nextNewGame.no_betting_time, this.nextNewGame.lottery_time);
-                // }
-                // platform.getGameResult(this.gameId);
-            }
-        }
-        if (!this.txtPhase) {
-            this.txtPhase = new egret.TextField();
-            this.txtPhase.textColor = 0xe7cf6e;
-            this.txtPhase.size = 24;
-            this.txtPhase.x = 560;
-            this.txtPhase.y = 40;
-
-            this.txtCountDown = new egret.TextField();
-            this.txtCountDown.textColor = 0xe7cf6e;
-            this.txtCountDown.size = 24;
-            this.txtCountDown.x = 692;
-            this.txtCountDown.y = 40;
-            this.txtCountDown.width = 42;
-            this.txtCountDown.textAlign = "center";
-        } else {
-            try {
-                this.removeChild(this.txtPhase);
-                this.removeChild(this.txtCountDown);
-            } catch (e) {
-
-            }
-        }
-        this.txtPhase.text = PhaseTitle[this.currentPhase.type];
-        this.txtCountDown.text = this.currentPhase.countDown + "";
-        this.addChildAt(this.txtPhase, 0);
-        this.addChildAt(this.txtCountDown, 0);
     }
 
     // 初始化卡包
@@ -385,8 +388,6 @@ class Game extends egret.Sprite {
 
     showPlayerResult(playerIdx: number, playSound: boolean = true) {
         let cards = this.getPlayerCards(playerIdx);
-        // cards[cards.length - 1].y -= 20;
-        // cards[cards.length - 2].y -= 20;
         let spResult = new egret.Sprite();
         let stateData = this.gameStateData;
         let cardResults = [stateData.game_detail_banker, stateData.game_result_a, stateData.game_result_b, stateData.game_result_c, stateData.game_result_d];
@@ -402,12 +403,6 @@ class Game extends egret.Sprite {
         spResult.y = pos.y + 58;
         this.spPlayerResults.push(spResult);
         this.addChild(spResult);
-
-        if (playerIdx === 0) {
-            setTimeout(() => {
-                this.showGameResult();
-            }, 1000);
-        }
     }
 
     getResultBitmapByMsg(msg: string): egret.Bitmap {
@@ -546,20 +541,21 @@ class Game extends egret.Sprite {
             sp.addChild(bmLabel);
             bmLabel.x = 450;
             bmLabel.y = 10;
-            let txt = new egret.TextField();
-            txt.text = stateData.banker_type === 0 ? "系统上庄" : "玩家上庄";
-            txt.textColor = 0xffffff;
-            txt.size = 24;
-            txt.x = 260;
-            txt.y = 24;
-            sp.addChild(txt);
-            let txt1 = new egret.TextField();
-            txt1.text = bettingNum + "";
-            txt1.textColor = 0xffffff;
-            txt1.size = 20;
-            txt1.x = 296;
-            txt1.y = 64;
-            sp.addChild(txt1);
+            // 去掉上庄
+            // let txt = new egret.TextField();
+            // txt.text = stateData.banker_type === 0 ? "系统上庄" : "玩家上庄";
+            // txt.textColor = 0xffffff;
+            // txt.size = 24;
+            // txt.x = 260;
+            // txt.y = 24;
+            // sp.addChild(txt);
+            // let txt1 = new egret.TextField();
+            // txt1.text = bettingNum + "";
+            // txt1.textColor = 0xffffff;
+            // txt1.size = 20;
+            // txt1.x = 296;
+            // txt1.y = 64;
+            // sp.addChild(txt1);
         } else {
             let resName = "brnn_env.win_" + (playerIdx + 1);
             let bm = new egret.Bitmap(utils.getRes(resName));

@@ -66,7 +66,14 @@ var HelpWindow = (function (_super) {
     };
     HelpWindow.prototype.createContents = function () {
         this.contents = ["brnn_env.help1", "brnn_env.help2", "help3_png"]
-            .map(function (resName) { return new egret.Bitmap(utils.getRes(resName)); });
+            .map(function (resName) {
+            var bm = new egret.Bitmap(utils.getRes(resName));
+            if (resName === "brnn_env.help1") {
+                bm.height = 180;
+                bm.fillMode = egret.BitmapFillMode.CLIP;
+            }
+            return bm;
+        });
         var scrollView = this.scrollView = new egret.ScrollView();
         scrollView.width = 672;
         scrollView.height = 375;
@@ -97,3 +104,4 @@ var HelpWindow = (function (_super) {
     return HelpWindow;
 }(egret.Sprite));
 __reflect(HelpWindow.prototype, "HelpWindow", ["ModalLifeCycle"]);
+//# sourceMappingURL=HelpWindow.js.map

@@ -47,3 +47,4 @@ var Button = (function (_super) {
     return Button;
 }(egret.Sprite));
 __reflect(Button.prototype, "Button");
+//# sourceMappingURL=Button.js.map

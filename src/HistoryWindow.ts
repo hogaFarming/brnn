@@ -40,32 +40,46 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
         this.addChild(bg);
         let factory = new ButtonFactory();
 
-        this.prevDisabledBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
-        this.prevDisabledBtn.x = 20;
-        this.prevDisabledBtn.y = 95;
-        this.addChild(this.prevDisabledBtn);
+        // 去掉左右按钮
+        // this.prevDisabledBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
+        // this.prevDisabledBtn.x = 20;
+        // this.prevDisabledBtn.y = 95;
+        // this.addChild(this.prevDisabledBtn);
 
-        this.prevBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
-        this.prevBtn.x = 20;
-        this.prevBtn.y = 95;
-        this.prevBtn.addEventListener(ButtonEvent.CLICK, this.showPrev, this);
-        this.addChild(this.prevBtn);
+        // this.prevBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
+        // this.prevBtn.x = 20;
+        // this.prevBtn.y = 95;
+        // this.prevBtn.addEventListener(ButtonEvent.CLICK, this.showPrev, this);
+        // this.addChild(this.prevBtn);
 
-        this.nextDisabledBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
-        this.nextDisabledBtn.x = 738;
-        this.nextDisabledBtn.y = 204;
-        this.nextDisabledBtn.rotation = 180;
-        this.addChild(this.nextDisabledBtn);
+        // this.nextDisabledBtn = factory.createButton(ButtonModels.HistoryPrevBtn);
+        // this.nextDisabledBtn.x = 738;
+        // this.nextDisabledBtn.y = 204;
+        // this.nextDisabledBtn.rotation = 180;
+        // this.addChild(this.nextDisabledBtn);
         
-        this.nextBtn = factory.createButton(ButtonModels.HistoryNextBtn);
-        this.nextBtn.x = 738;
-        this.nextBtn.y = 204;
-        this.nextBtn.rotation = 180;
-        this.nextBtn.addEventListener(ButtonEvent.CLICK, this.showNext, this);
-        this.addChild(this.nextBtn);
+        // this.nextBtn = factory.createButton(ButtonModels.HistoryNextBtn);
+        // this.nextBtn.x = 738;
+        // this.nextBtn.y = 204;
+        // this.nextBtn.rotation = 180;
+        // this.nextBtn.addEventListener(ButtonEvent.CLICK, this.showNext, this);
+        // this.addChild(this.nextBtn);
+
+        let bmNewRecord = new egret.Bitmap(utils.getRes("brnn_cards.newRecord"));
+        this.addChild(bmNewRecord);
+        bmNewRecord.x = 95;
+        bmNewRecord.y = 82;
+
+        let txtNewRecord = new egret.TextField();
+        txtNewRecord.text = "NEW";
+        txtNewRecord.x = 95;
+        txtNewRecord.y = 62;
+        txtNewRecord.textColor = 0xe4c74b;
+        txtNewRecord.size = 16;
+        this.addChild(txtNewRecord);
 
         this.spRecords = new egret.Sprite();
-        this.spRecords.x = 100;
+        this.spRecords.x = 96;
         this.spRecords.y = 85
         this.addChild(this.spRecords);
     }
@@ -93,10 +107,20 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
         let visibleRecords = this.recordsData.slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols);
         visibleRecords.forEach((recordItem, colIndex) => {
             recordItem.forEach((resultFlag, rowIndex) => {
-                let bm = new egret.Bitmap(resultFlag === 1 ? this.rightFlag : this.wrongFlag);
-                bm.x = colIndex * cellWidth;
-                bm.y = rowIndex * cellHeight;
-                this.spRecords.addChild(bm);
+                // let bm = new egret.Bitmap(resultFlag === 1 ? this.rightFlag : this.wrongFlag);
+                // bm.x = colIndex * cellWidth;
+                // bm.y = rowIndex * cellHeight;
+                let txt = new egret.TextField();
+                txt.text = resultFlag === 1 ? "胜" : "负";
+                txt.textColor = resultFlag === 1 ? 0x427908 : 0xda0a0a;
+                txt.x = colIndex * cellWidth;
+                txt.y = rowIndex * cellHeight;
+                txt.size = 24;
+                txt.width = cellWidth;
+                txt.height = cellHeight;
+                txt.textAlign = "center";
+                txt.verticalAlign = "center";
+                this.spRecords.addChild(txt);
             });
         });
     }

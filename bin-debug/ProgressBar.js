@@ -44,3 +44,4 @@ var ProgressBar = (function (_super) {
     return ProgressBar;
 }(egret.Sprite));
 __reflect(ProgressBar.prototype, "ProgressBar");
+//# sourceMappingURL=ProgressBar.js.map

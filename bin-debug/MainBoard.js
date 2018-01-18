@@ -1,3 +1,6 @@
+/**
+ * 游戏主面板
+ */
 var __reflect = (this && this.__reflect) || function (p, c, t) {
     p.__class__ = c, t ? t.push(c) : t = [c], p.__types__ = p.__types__ ? t.concat(p.__types__) : t;
 };
@@ -8,9 +11,8 @@ var __extends = this && this.__extends || function __extends(t, e) {
 for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
 r.prototype = e.prototype, t.prototype = new r();
 };
-/**
- * 游戏主面板
- */
+var Max_Bet_Percent = 0.2;
+var Max_Bet_Num = 300000;
 var MainBoard = (function (_super) {
     __extends(MainBoard, _super);
     function MainBoard() {
@@ -43,28 +45,35 @@ var MainBoard = (function (_super) {
         this.txtDealerType.text = dealerType;
     };
     MainBoard.prototype.setBeDealerBtn = function (isDealder) {
-        if (isDealder) {
-            this.btnBeDealer.visible = false;
-            this.btnBePlayer.visible = true;
-        }
-        else {
-            this.btnBeDealer.visible = true;
-            this.btnBePlayer.visible = false;
-        }
+        // 去掉上庄
+        // if (isDealder) {
+        //     this.btnBeDealer.visible = false;
+        //     this.btnBePlayer.visible = true;
+        // } else {
+        //     this.btnBeDealer.visible = true;
+        //     this.btnBePlayer.visible = false;
+        // }
     };
     MainBoard.prototype.addSprites = function () {
-        this.addBitmap("brnn_env.DealerInformation", 21, 28);
+        // 去掉上庄
+        // this.addBitmap("brnn_env.DealerInformation", 21, 28);
         this.addBitmap("brnn_env.timeBg", (1280 - 225) / 2, 7);
         this.txtMoney = this.createInfoText("0", 98, 605);
         this.txtScore = this.createInfoText("0", 98, 641);
         this.txtBetting = this.createInfoText("0", 98, 677);
         this.txtDealerType = this.createInfoText("", 120, 39);
+        this.txtDealerType.visible = false;
         this.txtDealerMoney = this.createInfoText("--", 120, 75);
+        this.txtDealerMoney.visible = false;
         this.txtDealerScore = this.createInfoText("0", 120, 111);
+        this.txtDealerScore.visible = false;
         this.txtDealerRounds = this.createInfoText("0", 120, 147);
+        this.txtDealerRounds.visible = false;
         this.btnHistory = this.createButton(ButtonModels.HistoryButton, this.showHistory, 263, 610);
         this.btnDealerList = this.createButton(ButtonModels.DealerListButton, this.showDealerList, 955, 610);
+        this.btnDealerList.visible = false;
         this.btnBeDealer = this.createButton(ButtonModels.BeDealerButton, this.handleBeDealer, 1120, 610);
+        this.btnBeDealer.visible = false;
         this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
         this.chips = this.createChips();
@@ -157,6 +166,15 @@ var MainBoard = (function (_super) {
         if (this.chipIdx === undefined)
             return;
         var amount = this.chips[this.chipIdx].value;
+        var currBet = this.currBettings[index];
+        if ((currBet + amount > app.game.coin_num * Max_Bet_Percent) || (currBet + amount > Max_Bet_Num)) {
+            new Dialog("超出目前最大下注限制");
+            return;
+        }
+        if (amount > app.game.coin_num) {
+            new Dialog("目前余额不足");
+            return;
+        }
         app.postBet(index, amount);
         // this.showBetAnimation(amount, index);
     };
@@ -291,3 +309,4 @@ var MainBoard = (function (_super) {
     return MainBoard;
 }(egret.DisplayObjectContainer));
 __reflect(MainBoard.prototype, "MainBoard");
+//# sourceMappingURL=MainBoard.js.map

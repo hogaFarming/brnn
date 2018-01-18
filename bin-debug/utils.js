@@ -70,7 +70,9 @@ var utils = {
         var num = Math.floor(Math.random() * diff);
         return min + num;
     },
-    unixTimeToDate: function (unixTime) {
-        return new Date(unixTime * 1000);
+    unixTime: function (unixTime) {
+        var date = new Date(unixTime * 1000);
+        return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
     }
 };
+//# sourceMappingURL=utils.js.map

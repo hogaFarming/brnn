@@ -73,11 +73,29 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     async getGameState() {
         let res = await http.get("/api/game_info_now");
-        return res.data as GameStateData;
+        let data = <GameStateData>res.data;
+        if (data.now_time && data.lottery_time) {
+            let client_now_time = Math.round(+new Date() / 1000);
+            let diff = client_now_time - data.now_time;
+            data.lottery_time += diff;
+            data.no_betting_time && (data.no_betting_time += diff);
+            if (data.next_game_info) {
+                let lottery_time = data.next_game_info.lottery_time;
+                data.next_game_info.lottery_time += diff;
+                data.next_game_info.no_betting_time += diff;
+                console.log(
+                    `下一局游戏开奖时间：(${data.next_game_info.lottery_time - client_now_time}秒后) 本地(${utils.unixTime(data.next_game_info.lottery_time)})，服务(${utils.unixTime(lottery_time)})。
+                    当前服务器时间(${utils.unixTime(data.now_time)})，
+                    当前客户端时间(${utils.unixTime(client_now_time)})，
+                    校准值为${diff}秒
+                    `
+                );
+            }
+        }
+        return data;
     }
 
     async getGameResult(gameId: number) {
-        console.log("get game result... ");
         let res = await http.get("/api/game_result", { params: { id: gameId } });
         if (res.data.status === 0) return null;
         let evt = new RemoteEvent(RemoteEvent.GAME_RECEIVED_RESULT);
@@ -150,10 +168,8 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
         this.ws.connect(address, port);
     }
 
-    onSocketOpen(): void {
-        var cmd = "Hello Egret WebSocket";    
-        console.log("连接成功，发送数据：" + cmd);    
-        // this.ws.writeUTF(cmd);
+    onSocketOpen(): void { 
+        console.log("Egret WebSocket 连接成功");    
     }
 
     onSocketData(e: egret.Event): void {
@@ -165,11 +181,20 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 this.bindSocket(clientId);
             } else if (parsed.type === "game_create") {
                 let evt = new RemoteEvent(RemoteEvent.GAME_CREATE);
+                let client_now_time = Math.round(+new Date() / 1000);
+                let diff = client_now_time - parsed.now_time;
                 evt.data = {
                     game_id: parsed.game_id,
-                    lottery_time: parsed.lottery_time,
-                    no_betting_time: parsed.no_betting_time
+                    lottery_time: parsed.lottery_time + diff,
+                    no_betting_time: parsed.no_betting_time + diff
                 };
+                console.log(
+                    `下一局游戏开奖时间：(${evt.data.lottery_time - client_now_time}秒后) 本地(${utils.unixTime(evt.data.lottery_time)})，服务(${utils.unixTime(parsed.lottery_time)})。
+                    当前服务器时间(${utils.unixTime(parsed.now_time)})，
+                    当前客户端时间(${utils.unixTime(client_now_time)})，
+                    校准值为${diff}秒
+                    `
+                );
                 this.dispatchEvent(evt);
             } else if (parsed.type === "game_result") {
                 this.getGameResult(parsed.id);

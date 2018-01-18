@@ -64,7 +64,14 @@ class HelpWindow extends egret.Sprite implements ModalLifeCycle {
 
     private createContents() {
         this.contents = ["brnn_env.help1", "brnn_env.help2", "help3_png"]
-            .map(resName => new egret.Bitmap(utils.getRes(resName)));
+            .map(resName => {
+                let bm = new egret.Bitmap(utils.getRes(resName));
+                if (resName === "brnn_env.help1") {
+                    bm.height = 180;
+                    bm.fillMode = egret.BitmapFillMode.CLIP;
+                }
+                return bm;
+            });
         let scrollView = this.scrollView = new egret.ScrollView();
         scrollView.width = 672;
         scrollView.height = 375;
