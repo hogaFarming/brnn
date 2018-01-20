@@ -104,15 +104,23 @@ class HistoryWindow extends egret.Sprite implements ModalLifeCycle {
         // let startY = 85;
         let cellWidth = 40;
         let cellHeight = 34;
-        let visibleRecords = this.recordsData.slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols);
+        let visibleRecords = this.recordsData
+            .slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols)
+            .filter(record => {
+                if (!app.game.currentPhase) return true;
+                if (record[4] === app.game.gameId && app.game.currentPhase.type === PhaseType.Dispatch) {
+                    return false;
+                }
+                return true;
+            });
         visibleRecords.forEach((recordItem, colIndex) => {
-            recordItem.forEach((resultFlag, rowIndex) => {
+            recordItem.slice(0, 4).forEach((resultFlag, rowIndex) => {
                 // let bm = new egret.Bitmap(resultFlag === 1 ? this.rightFlag : this.wrongFlag);
                 // bm.x = colIndex * cellWidth;
                 // bm.y = rowIndex * cellHeight;
                 let txt = new egret.TextField();
                 txt.text = resultFlag === 1 ? "胜" : "负";
-                txt.textColor = resultFlag === 1 ? 0x427908 : 0xda0a0a;
+                txt.textColor = resultFlag === 1 ? 0xda0a0a : 0x427908;
                 txt.x = colIndex * cellWidth;
                 txt.y = rowIndex * cellHeight;
                 txt.size = 24;

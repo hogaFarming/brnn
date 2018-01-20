@@ -103,7 +103,7 @@ var MainBoard = (function (_super) {
     MainBoard.prototype.createChips = function () {
         var _this = this;
         var result = [];
-        var chipValues = [1000, 5000, 10000, 100000, 500000, 1000000];
+        var chipValues = [10, 100, 500, 1000, 5000, 10000];
         var startChipX = 345;
         var chipY = 590;
         var chipMargin = 10;
@@ -168,7 +168,7 @@ var MainBoard = (function (_super) {
         var amount = this.chips[this.chipIdx].value;
         var currBet = this.currBettings[index];
         if ((currBet + amount > app.game.coin_num * Max_Bet_Percent) || (currBet + amount > Max_Bet_Num)) {
-            new Dialog("超出目前最大下注限制");
+            new Dialog("超过允许投注数");
             return;
         }
         if (amount > app.game.coin_num) {

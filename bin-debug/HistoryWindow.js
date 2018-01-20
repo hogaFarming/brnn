@@ -93,15 +93,24 @@ var HistoryWindow = (function (_super) {
         // let startY = 85;
         var cellWidth = 40;
         var cellHeight = 34;
-        var visibleRecords = this.recordsData.slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols);
+        var visibleRecords = this.recordsData
+            .slice(this.showingIdx, this.showingIdx + HistoryWindow.visibleCols)
+            .filter(function (record) {
+            if (!app.game.currentPhase)
+                return true;
+            if (record[4] === app.game.gameId && app.game.currentPhase.type === PhaseType.Dispatch) {
+                return false;
+            }
+            return true;
+        });
         visibleRecords.forEach(function (recordItem, colIndex) {
-            recordItem.forEach(function (resultFlag, rowIndex) {
+            recordItem.slice(0, 4).forEach(function (resultFlag, rowIndex) {
                 // let bm = new egret.Bitmap(resultFlag === 1 ? this.rightFlag : this.wrongFlag);
                 // bm.x = colIndex * cellWidth;
                 // bm.y = rowIndex * cellHeight;
                 var txt = new egret.TextField();
                 txt.text = resultFlag === 1 ? "胜" : "负";
-                txt.textColor = resultFlag === 1 ? 0x427908 : 0xda0a0a;
+                txt.textColor = resultFlag === 1 ? 0xda0a0a : 0x427908;
                 txt.x = colIndex * cellWidth;
                 txt.y = rowIndex * cellHeight;
                 txt.size = 24;

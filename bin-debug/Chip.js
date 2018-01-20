@@ -9,12 +9,12 @@ for (var i in e) e.hasOwnProperty(i) && (t[i] = e[i]);
 r.prototype = e.prototype, t.prototype = new r();
 };
 var ChipValMap = {
-    1000: ["brnn_env.chip_0", 0xdbbc3f],
-    5000: ["brnn_env.chip_1", 0x589b44],
-    10000: ["brnn_env.chip_2", 0x20a8a3],
-    100000: ["brnn_env.chip_3", 0x2067a9],
-    500000: ["brnn_env.chip_4", 0x7b2fad],
-    1000000: ["brnn_env.chip_5", 0xc92121]
+    10: ["brnn_env.chip_0", 0xdbbc3f],
+    100: ["brnn_env.chip_1", 0x589b44],
+    500: ["brnn_env.chip_2", 0x20a8a3],
+    1000: ["brnn_env.chip_3", 0x2067a9],
+    5000: ["brnn_env.chip_4", 0x7b2fad],
+    10000: ["brnn_env.chip_5", 0xc92121]
 };
 var Chip = (function (_super) {
     __extends(Chip, _super);

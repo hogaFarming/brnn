@@ -106,12 +106,12 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     async bet(gameId, amount, playerIdx) {
         let chipTypeMap = {
-            1000: 0,
-            5000: 1,
-            10000: 2,
-            100000: 3,
-            500000: 4,
-            1000000: 5
+            10: 0,
+            100: 1,
+            500: 2,
+            1000: 3,
+            5000: 4,
+            10000: 5
         };
         let res = await http.post("/api/betting", {
             data: {
@@ -129,13 +129,15 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 isFromOther: false
             };
             this.dispatchEvent(evt);
+        } else {
+            new Dialog(res.error_msg);
         }
     }
 
     async getHistory(gameId) {
         let res = await http.get("/api/game_history", { params: { id: gameId } });
         let list = res.data.map(item => {
-            return [item.player_a_result, item.player_b_result, item.player_c_result, item.player_d_result];
+            return [item.player_a_result, item.player_b_result, item.player_c_result, item.player_d_result, item.id];
         });
         return list;
     }
@@ -202,12 +204,12 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 this.getGameResult(parsed.id);
             } else if (parsed.type === "game_user_betting") {
                 let chipTypeMap2 = {
-                    0: 1000,
-                    1: 5000,
-                    2: 10000,
-                    3: 100000,
-                    4: 500000,
-                    5: 1000000
+                    0: 10,
+                    1: 100,
+                    2: 500,
+                    3: 1000,
+                    4: 5000,
+                    5: 10000
                 };
                 let evt = new RemoteEvent(RemoteEvent.BET);
                 evt.data = {

@@ -132,7 +132,7 @@ class MainBoard extends egret.DisplayObjectContainer {
 
     private createChips(): Array<Chip> {
         let result = [];
-        const chipValues = [1000, 5000, 10000, 100000, 500000, 1000000];
+        const chipValues = [10, 100, 500, 1000, 5000, 10000];
         const startChipX = 345;
         const chipY = 590;
         const chipMargin = 10;
@@ -198,7 +198,7 @@ class MainBoard extends egret.DisplayObjectContainer {
 
         let currBet = this.currBettings[index];
         if ((currBet + amount > app.game.coin_num * Max_Bet_Percent) || (currBet + amount > Max_Bet_Num)) {
-            new Dialog("超出目前最大下注限制");
+            new Dialog("超过允许投注数");
             return;
         }
         if (amount > app.game.coin_num) {

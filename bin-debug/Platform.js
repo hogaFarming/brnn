@@ -154,12 +154,12 @@ var WeixinPlatform = (function (_super) {
                 switch (_a.label) {
                     case 0:
                         chipTypeMap = {
-                            1000: 0,
-                            5000: 1,
-                            10000: 2,
-                            100000: 3,
-                            500000: 4,
-                            1000000: 5
+                            10: 0,
+                            100: 1,
+                            500: 2,
+                            1000: 3,
+                            5000: 4,
+                            10000: 5
                         };
                         return [4 /*yield*/, http.post("/api/betting", {
                                 data: {
@@ -180,6 +180,9 @@ var WeixinPlatform = (function (_super) {
                             };
                             this.dispatchEvent(evt);
                         }
+                        else {
+                            new Dialog(res.error_msg);
+                        }
                         return [2 /*return*/];
                 }
             });
@@ -194,7 +197,7 @@ var WeixinPlatform = (function (_super) {
                     case 1:
                         res = _a.sent();
                         list = res.data.map(function (item) {
-                            return [item.player_a_result, item.player_b_result, item.player_c_result, item.player_d_result];
+                            return [item.player_a_result, item.player_b_result, item.player_c_result, item.player_d_result, item.id];
                         });
                         return [2 /*return*/, list];
                 }
@@ -294,12 +297,12 @@ var WeixinPlatform = (function (_super) {
             }
             else if (parsed.type === "game_user_betting") {
                 var chipTypeMap2 = {
-                    0: 1000,
-                    1: 5000,
-                    2: 10000,
-                    3: 100000,
-                    4: 500000,
-                    5: 1000000
+                    0: 10,
+                    1: 100,
+                    2: 500,
+                    3: 1000,
+                    4: 5000,
+                    5: 10000
                 };
                 var evt = new RemoteEvent(RemoteEvent.BET);
                 evt.data = {
