@@ -236,6 +236,9 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
     private async _login() {
         // 第一步，从本地检查登录状态
         let loginStatus = utils.cache.get("isLogin");
+        if (utils.cache.get("debug")) {
+            debugger;
+        }
         if (!loginStatus || loginStatus === "0") {
             let isAuth = utils.cache.get("isAuth");
             if (isAuth === "1") return;
@@ -245,6 +248,8 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
                 "?callback=" + (encodeURIComponent(callbackUrl)) +
                 "&token=" + apiToken +
                 "&type=mp";
+            console.log("redirect url: " + url);
+            console.log("callback url == " + callbackUrl);
             utils.cache.set("isLogin", "2");
             window.location.href = url;
         } else if (loginStatus === "2") {
@@ -256,7 +261,10 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     private async judgeLogin() {
         try {
-            let res = await http.get("/api/judge/logins?usertest=74");
+            let res = await http.get("/api/judge/logins");
+            if (utils.cache.get("debug")) {
+                debugger;
+            }
             if (res.data.is_auth === 1 && res.data.is_user === 0) {
                 utils.cache.set("isLogin", "0");
                 utils.cache.set("isAuth", "1");

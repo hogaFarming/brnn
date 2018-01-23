@@ -8,7 +8,7 @@ interface HttpOptions {
 }
 
 class Http {
-    static URL_BASE = "http://120.79.21.200";
+    static URL_BASE = "http://api.sc.shouyouhuyu.com";
     static DEFAULT_HTTP_OPTIONS: HttpOptions = {
         method: "get"
     };
@@ -17,10 +17,12 @@ class Http {
     };
 
     public async getApiToken() {
+        http_api_token = utils.cache.get("http_api_token");
         if (http_api_token) return http_api_token;
         try {
             const result = await this._request("/api/init");
             http_api_token = result.token;
+            utils.cache.set("http_api_token", http_api_token);
             console.log("http_api_token: " + http_api_token);
             return http_api_token;
         } catch (e) {
@@ -83,6 +85,17 @@ class Http {
             }, this);
             request.addEventListener(egret.IOErrorEvent.IO_ERROR, (event: egret.IOErrorEvent) => {
                 console.log("http get error", event);
+                try {
+                    let req = <egret.HttpRequest>event.currentTarget;
+                    let res = JSON.parse(req.response);
+                    if (res.error_code === "NO LOGIN") {
+                        utils.cache.set("isLogin", 0);
+                        utils.cache.set("isAuth", 0);
+                        platform.login();
+                    }
+                } catch (e) {
+                    console.error(event);
+                }
                 reject(event);
             }, this);
         });

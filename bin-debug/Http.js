@@ -46,6 +46,7 @@ var Http = (function () {
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
+                        http_api_token = utils.cache.get("http_api_token");
                         if (http_api_token)
                             return [2 /*return*/, http_api_token];
                         _a.label = 1;
@@ -55,6 +56,7 @@ var Http = (function () {
                     case 2:
                         result = _a.sent();
                         http_api_token = result.token;
+                        utils.cache.set("http_api_token", http_api_token);
                         console.log("http_api_token: " + http_api_token);
                         return [2 /*return*/, http_api_token];
                     case 3:
@@ -137,6 +139,18 @@ var Http = (function () {
                             }, _this);
                             request.addEventListener(egret.IOErrorEvent.IO_ERROR, function (event) {
                                 console.log("http get error", event);
+                                try {
+                                    var req = event.currentTarget;
+                                    var res = JSON.parse(req.response);
+                                    if (res.error_code === "NO LOGIN") {
+                                        utils.cache.set("isLogin", 0);
+                                        utils.cache.set("isAuth", 0);
+                                        platform.login();
+                                    }
+                                }
+                                catch (e) {
+                                    console.error(event);
+                                }
                                 reject(event);
                             }, _this);
                         })];
@@ -144,7 +158,7 @@ var Http = (function () {
             });
         });
     };
-    Http.URL_BASE = "http://120.79.21.200";
+    Http.URL_BASE = "http://api.sc.shouyouhuyu.com";
     Http.DEFAULT_HTTP_OPTIONS = {
         method: "get"
     };

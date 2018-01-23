@@ -332,6 +332,9 @@ var WeixinPlatform = (function (_super) {
                 switch (_a.label) {
                     case 0:
                         loginStatus = utils.cache.get("isLogin");
+                        if (utils.cache.get("debug")) {
+                            debugger;
+                        }
                         if (!(!loginStatus || loginStatus === "0")) return [3 /*break*/, 2];
                         isAuth = utils.cache.get("isAuth");
                         if (isAuth === "1")
@@ -344,6 +347,8 @@ var WeixinPlatform = (function (_super) {
                             "?callback=" + (encodeURIComponent(callbackUrl)) +
                             "&token=" + apiToken +
                             "&type=mp";
+                        console.log("redirect url: " + url);
+                        console.log("callback url == " + callbackUrl);
                         utils.cache.set("isLogin", "2");
                         window.location.href = url;
                         return [3 /*break*/, 3];
@@ -366,9 +371,12 @@ var WeixinPlatform = (function (_super) {
                 switch (_a.label) {
                     case 0:
                         _a.trys.push([0, 7, , 9]);
-                        return [4 /*yield*/, http.get("/api/judge/logins?usertest=74")];
+                        return [4 /*yield*/, http.get("/api/judge/logins")];
                     case 1:
                         res = _a.sent();
+                        if (utils.cache.get("debug")) {
+                            debugger;
+                        }
                         if (!(res.data.is_auth === 1 && res.data.is_user === 0)) return [3 /*break*/, 2];
                         utils.cache.set("isLogin", "0");
                         utils.cache.set("isAuth", "1");
