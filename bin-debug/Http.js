@@ -137,22 +137,53 @@ var Http = (function () {
                                     reject(e);
                                 }
                             }, _this);
-                            request.addEventListener(egret.IOErrorEvent.IO_ERROR, function (event) {
-                                console.log("http get error", event);
-                                try {
-                                    var req = event.currentTarget;
-                                    var res = JSON.parse(req.response);
-                                    if (res.error_code === "NO LOGIN") {
-                                        utils.cache.set("isLogin", 0);
-                                        utils.cache.set("isAuth", 0);
-                                        platform.login();
+                            request.addEventListener(egret.IOErrorEvent.IO_ERROR, function (event) { return __awaiter(_this, void 0, void 0, function () {
+                                var req, res, errMsg, e_2;
+                                return __generator(this, function (_a) {
+                                    switch (_a.label) {
+                                        case 0:
+                                            console.log("http get error", event);
+                                            _a.label = 1;
+                                        case 1:
+                                            _a.trys.push([1, 7, , 8]);
+                                            req = event.currentTarget;
+                                            res = JSON.parse(req.response);
+                                            if (!(res.error_code === "NO LOGIN")) return [3 /*break*/, 3];
+                                            utils.cache.set("isLogin", 0);
+                                            utils.cache.set("isAuth", 0);
+                                            console.log("未登录");
+                                            return [4 /*yield*/, platform.login()];
+                                        case 2:
+                                            _a.sent();
+                                            console.log("重新发送请求");
+                                            this._request(url, options).then(resolve, reject);
+                                            return [3 /*break*/, 6];
+                                        case 3:
+                                            if (!(res.error_code === "AUTHORIZATION_INVALID")) return [3 /*break*/, 5];
+                                            utils.cache.set("isLogin", 2);
+                                            utils.cache.set("isAuth", 0);
+                                            utils.cache.remove("http_api_token");
+                                            console.log("token过期");
+                                            return [4 /*yield*/, this.getApiToken()];
+                                        case 4:
+                                            _a.sent();
+                                            console.log("重新发送请求");
+                                            this._request(url, options).then(resolve, reject);
+                                            return [3 /*break*/, 6];
+                                        case 5:
+                                            errMsg = res.error_msg || "网络连接出错";
+                                            reject(new Error(errMsg));
+                                            _a.label = 6;
+                                        case 6: return [3 /*break*/, 8];
+                                        case 7:
+                                            e_2 = _a.sent();
+                                            reject(e_2);
+                                            console.error(e_2);
+                                            return [3 /*break*/, 8];
+                                        case 8: return [2 /*return*/];
                                     }
-                                }
-                                catch (e) {
-                                    console.error(event);
-                                }
-                                reject(event);
-                            }, _this);
+                                });
+                            }); }, _this);
                         })];
                 }
             });

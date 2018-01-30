@@ -103,16 +103,15 @@ var Main = (function (_super) {
             var gameConfig, gameState;
             return __generator(this, function (_a) {
                 switch (_a.label) {
-                    case 0: return [4 /*yield*/, this.loadResource()];
+                    case 0: return [4 /*yield*/, platform.login()];
                     case 1:
                         _a.sent();
-                        this.createGameScene();
-                        // this.showLoading();
-                        return [4 /*yield*/, this.loadSounds()];
+                        return [4 /*yield*/, this.loadResource()];
                     case 2:
-                        // this.showLoading();
                         _a.sent();
-                        return [4 /*yield*/, platform.login()];
+                        this.createGameScene();
+                        this.showLoading();
+                        return [4 /*yield*/, this.loadSounds()];
                     case 3:
                         _a.sent();
                         return [4 /*yield*/, platform.getGameConfig()];
@@ -121,6 +120,7 @@ var Main = (function (_super) {
                         return [4 /*yield*/, platform.getGameState()];
                     case 5:
                         gameState = _a.sent();
+                        this.hideLoading();
                         this.game.init(gameState, gameConfig);
                         platform.getUserMoney().then(function (result) {
                             app.mainBoard.setMoney(result.num);

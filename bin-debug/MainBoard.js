@@ -76,6 +76,8 @@ var MainBoard = (function (_super) {
         this.btnBeDealer.visible = false;
         this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
+        this.btnQubi = this.createButton(ButtonModels.QubiBtn, this.showQubi, 955, 610);
+        this.btnDuihuan = this.createButton(ButtonModels.DuihuanBtn, this.showDuihuan, 1120, 610);
         this.chips = this.createChips();
         this.spPlayerAreas = this.createPlayerAreas();
     };
@@ -299,6 +301,12 @@ var MainBoard = (function (_super) {
     };
     MainBoard.prototype.showDealerList = function () {
         app.modalManager.openDealerListModal();
+    };
+    MainBoard.prototype.showQubi = function () {
+        app.modalManager.openQubiModal();
+    };
+    MainBoard.prototype.showDuihuan = function () {
+        app.modalManager.openDuihuanModal();
     };
     MainBoard.prototype.handleBeDealer = function () {
         app.beDealer();

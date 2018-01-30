@@ -70,13 +70,14 @@ class Main extends egret.DisplayObjectContainer {
     }
 
     private async runGame() {
+        await platform.login();
         await this.loadResource();
         this.createGameScene();
-        // this.showLoading();
+        this.showLoading();
         await this.loadSounds();
-        await platform.login();
         let gameConfig = await platform.getGameConfig();
         let gameState: GameStateData = await platform.getGameState();
+        this.hideLoading();
         this.game.init(gameState, gameConfig);
         
         platform.getUserMoney().then(result => {

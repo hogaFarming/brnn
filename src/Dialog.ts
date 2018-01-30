@@ -1,10 +1,12 @@
 class Dialog extends egret.Sprite {
 
     private message: string;
+    private callback: Function;
 
-    constructor(message: string) {
+    constructor(message: string, callback?: Function) {
         super();
         this.message = message;
+        this.callback = callback;
         this.init();
     }
 
@@ -38,6 +40,7 @@ class Dialog extends egret.Sprite {
     }
 
     private handleConfirm() {
+        this.callback && this.callback();
         app.stage.removeChild(this);
     }
 }

@@ -27,6 +27,9 @@ class MainBoard extends egret.DisplayObjectContainer {
     private btnBeDealer: Button; // 申请上庄按钮;
     private btnBePlayer: Button; // 申请下庄按钮;
 
+    private btnQubi: Button; // 取币按钮
+    private btnDuihuan: Button; // 兑换按钮
+
     private spPlayerAreas: Array<egret.Sprite>; // 下筹区域
     private betChips: Array<Chip> = []; // 已下筹码
     private txtCurrBettings: Array<egret.TextField> = []; // 显示四个位置下注金额
@@ -101,6 +104,9 @@ class MainBoard extends egret.DisplayObjectContainer {
         this.btnBeDealer.visible = false;
         this.btnBePlayer = this.createButton(ButtonModels.BePlayerButton, this.handleBePlayer, 1120, 610);
         this.btnBePlayer.visible = false;
+
+        this.btnQubi = this.createButton(ButtonModels.QubiBtn, this.showQubi, 955, 610);
+        this.btnDuihuan = this.createButton(ButtonModels.DuihuanBtn, this.showDuihuan, 1120, 610);
 
         this.chips = this.createChips();
 
@@ -336,6 +342,14 @@ class MainBoard extends egret.DisplayObjectContainer {
 
     private showDealerList(): void {
         app.modalManager.openDealerListModal();
+    }
+
+    private showQubi(): void {
+        app.modalManager.openQubiModal();
+    }
+
+    private showDuihuan(): void {
+        app.modalManager.openDuihuanModal();
     }
 
     private handleBeDealer(): void {

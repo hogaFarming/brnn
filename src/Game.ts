@@ -71,6 +71,8 @@ class Game extends egret.Sprite {
     public currentPhase: Phase;
     public no_betting_time: number; // 截止下注时间
     public coin_num: number = 0; // 余额
+    public fufen_num: number = 0; // 积分
+    public exchange_rate: number; // 汇率
     public is_banker: number = 0;
     public banker_username: string = "";
     private cardPackage: Array<Card>;
@@ -96,6 +98,8 @@ class Game extends egret.Sprite {
         this.gameId = stateData.id;
         if (gameConfig) {
             this.coin_num = gameConfig.coin_num;
+            this.fufen_num = gameConfig.fufen_num;
+            this.exchange_rate = gameConfig.exchange_rate;
             app.mainBoard.setMoney(gameConfig.coin_num);
         }
 

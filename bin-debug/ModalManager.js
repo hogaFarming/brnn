@@ -22,6 +22,10 @@ var ModalManager = (function (_super) {
         this.addChild(this.historyModal);
         this.dealerListModal = new Modal(new DealerListWindow());
         this.addChild(this.dealerListModal);
+        this.qubiModal = new Modal(new QubiWindow());
+        this.addChild(this.qubiModal);
+        this.duihuanModal = new Modal(new DuihuanWindow());
+        this.addChild(this.duihuanModal);
     };
     ModalManager.prototype.openHelpModal = function () {
         console.log("open help modal");
@@ -34,6 +38,12 @@ var ModalManager = (function (_super) {
     ModalManager.prototype.openDealerListModal = function () {
         console.log("open historyModal");
         this.dealerListModal.open();
+    };
+    ModalManager.prototype.openQubiModal = function () {
+        this.qubiModal.open();
+    };
+    ModalManager.prototype.openDuihuanModal = function () {
+        this.duihuanModal.open();
     };
     return ModalManager;
 }(egret.Sprite));

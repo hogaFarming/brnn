@@ -95,6 +95,30 @@ const ButtonModels = {
         normal: { x: 0, y: 1, h: 50 },
         hover: { x: 0, y: 54, h: 52 },
         pressed: { x: 0, y: 110, h: 50 }
+    },
+    QubiBtn: {
+        resName: "brnn_qubi.qubiBtn",
+        normal: { x: 0, y: 0, h: 51 },
+        hover: { x: 0, y: 0, h: 51 },
+        pressed: { x: 0, y: 0, h: 51 }
+    },
+    DuihuanBtn: {
+        resName: "brnn_qubi.duihuanBtn",
+        normal: { x: 0, y: 0, h: 51 },
+        hover: { x: 0, y: 0, h: 51 },
+        pressed: { x: 0, y: 0, h: 51 }
+    },
+    QubiConfirmBtn: {
+        resName: "brnn_qubi.confirmBtn2",
+        normal: { x: 0, y: 0, h: 50 },
+        hover: { x: 0, y: 0, h: 50 },
+        pressed: { x: 0, y: 0, h: 50 }
+    },
+    DuihuanConfirmBtn: {
+        resName: "brnn_qubi.confirmBtn",
+        normal: { x: 0, y: 0, h: 50 },
+        hover: { x: 0, y: 0, h: 50 },
+        pressed: { x: 0, y: 0, h: 50 }
     }
 };
 

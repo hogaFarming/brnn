@@ -62,7 +62,8 @@ var WeixinPlatform = (function (_super) {
     function WeixinPlatform() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    WeixinPlatform.prototype.getGameConfig = function () {
+    WeixinPlatform.prototype.getGameConfig = function (isInit) {
+        if (isInit === void 0) { isInit = true; }
         return __awaiter(this, void 0, void 0, function () {
             var res, config;
             return __generator(this, function (_a) {
@@ -71,7 +72,9 @@ var WeixinPlatform = (function (_super) {
                     case 1:
                         res = _a.sent();
                         config = res.data.config;
-                        this.connectSocket(config.ip, config.port);
+                        if (isInit) {
+                            this.connectSocket(config.ip, config.port);
+                        }
                         return [2 /*return*/, res.data];
                 }
             });
@@ -99,6 +102,23 @@ var WeixinPlatform = (function (_super) {
                     case 1:
                         res = _a.sent();
                         return [2 /*return*/, res.data];
+                }
+            });
+        });
+    };
+    WeixinPlatform.prototype.exchangeCoin = function (amount, type) {
+        return __awaiter(this, void 0, void 0, function () {
+            var data;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        data = {
+                            num: amount,
+                            type_for: type,
+                            type: 1
+                        };
+                        return [4 /*yield*/, http.post("/api/exchangecoin", { data: data })];
+                    case 1: return [2 /*return*/, _a.sent()];
                 }
             });
         });

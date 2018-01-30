@@ -10,9 +10,10 @@ r.prototype = e.prototype, t.prototype = new r();
 };
 var Dialog = (function (_super) {
     __extends(Dialog, _super);
-    function Dialog(message) {
+    function Dialog(message, callback) {
         var _this = _super.call(this) || this;
         _this.message = message;
+        _this.callback = callback;
         _this.init();
         return _this;
     }
@@ -41,6 +42,7 @@ var Dialog = (function (_super) {
         app.stage.addChild(this);
     };
     Dialog.prototype.handleConfirm = function () {
+        this.callback && this.callback();
         app.stage.removeChild(this);
     };
     return Dialog;

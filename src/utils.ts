@@ -65,5 +65,20 @@ let utils = {
     unixTime(unixTime: number): string {
         let date = new Date(unixTime * 1000);
         return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    },
+    isNumber(input: string): boolean {
+        let num = +input;
+        if (isNaN(num)) {
+            return false;
+        }
+        return true;
+    },
+    coinToFufen(coin: number): number {
+        if (!app.game.exchange_rate) return 0;
+        return Math.floor(coin * app.game.exchange_rate);
+    },
+    fufenToCoin(fufen: number): number {
+        if (!app.game.exchange_rate) return 0;
+        return Math.floor(fufen / app.game.exchange_rate);
     }
 };

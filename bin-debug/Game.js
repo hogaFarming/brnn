@@ -30,6 +30,7 @@ var Game = (function (_super) {
     function Game() {
         var _this = _super.call(this) || this;
         _this.coin_num = 0; // 余额
+        _this.fufen_num = 0; // 积分
         _this.is_banker = 0;
         _this.banker_username = "";
         _this.startIndex = 0; // 从哪个玩家开始发牌
@@ -42,6 +43,8 @@ var Game = (function (_super) {
         this.gameId = stateData.id;
         if (gameConfig) {
             this.coin_num = gameConfig.coin_num;
+            this.fufen_num = gameConfig.fufen_num;
+            this.exchange_rate = gameConfig.exchange_rate;
             app.mainBoard.setMoney(gameConfig.coin_num);
         }
         if (stateData.status === 0) {

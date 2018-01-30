@@ -5,7 +5,7 @@
 			"name": "loading"
 		},
 		{
-			"keys": "blackBG_png,help3_png,brnn_cards,BG_png,brnn_env,brnn_ani",
+			"keys": "blackBG_png,help3_png,brnn_cards,BG_png,brnn_env,brnn_ani,brnn_qubi",
 			"name": "ui"
 		},
 		{
@@ -172,6 +172,12 @@
 			"type": "sheet",
 			"name": "brnn_ani",
 			"subkeys": "lookCards_01,lookCards_02,lookCards_03,lookCards_04,lookCards_05,lookCards_06,lookCards_07,lookCards_08,lookCards_09,lookCards_10,lookCards_11,lookCards_12,lookCards_13,lookCards_14,lookCards_15,lookCards_16,lookCards_17,lookCards_18,lookCards_19,lookCards_20,lookCards_21"
+		},
+		{
+			"url": "assets/brnn_qubi.json",
+			"type": "sheet",
+			"name": "brnn_qubi",
+			"subkeys": "confirmBtn,confirmBtn2,duihuanBtn,inputBG,qubiBG,qubiBtn"
 		}
 	]
 }

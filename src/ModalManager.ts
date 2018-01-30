@@ -1,8 +1,10 @@
 class ModalManager extends egret.Sprite {
 
-    private helpModal: Modal;
-    private historyModal: Modal;
-    private dealerListModal: Modal;
+    public helpModal: Modal;
+    public historyModal: Modal;
+    public dealerListModal: Modal;
+    public qubiModal: Modal;
+    public duihuanModal: Modal;
 
     constructor() {
         super();
@@ -16,6 +18,10 @@ class ModalManager extends egret.Sprite {
         this.addChild(this.historyModal);
         this.dealerListModal = new Modal(new DealerListWindow());
         this.addChild(this.dealerListModal);
+        this.qubiModal = new Modal(new QubiWindow());
+        this.addChild(this.qubiModal);
+        this.duihuanModal = new Modal(new DuihuanWindow());
+        this.addChild(this.duihuanModal);
     }
 
     public openHelpModal(): void {
@@ -31,5 +37,13 @@ class ModalManager extends egret.Sprite {
     public openDealerListModal(): void {
         console.log("open historyModal");
         this.dealerListModal.open();
+    }
+
+    public openQubiModal(): void {
+        this.qubiModal.open();
+    }
+
+    public openDuihuanModal(): void {
+        this.duihuanModal.open();
     }
 }

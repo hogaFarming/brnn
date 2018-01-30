@@ -1,3 +1,4 @@
+type EXCHANGE_TYPE = 0 | 1;
 /** 
  * 平台数据接口。
  * 由于每款游戏通常需要发布到多个平台上，所以提取出一个统一的接口用于开发者获取平台数据信息
@@ -6,7 +7,7 @@
  */
 declare interface Platform extends egret.EventDispatcher {
 
-    getGameConfig(): Promise<any>;
+    getGameConfig(isInit?: boolean): Promise<any>;
 
     getUserMoney(): Promise<any>;
 
@@ -26,7 +27,9 @@ declare interface Platform extends egret.EventDispatcher {
 
     applyPlayer(): Promise<any>;
 
-    login(): Promise<any>
+    login(): Promise<any>;
+
+    exchangeCoin(amount: number, type: EXCHANGE_TYPE): Promise<any>;
 
 }
 
@@ -54,10 +57,20 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
 
     private ws: egret.WebSocket;
 
-    async getGameConfig() {
+    async getGameConfig(isInit = true) {
+        // return http.get("/api/gameinfo_niuniu").then(res => {
+        //     debugger;
+        //     let config = res.data.config;
+        //     this.connectSocket(config.ip, config.port);
+        //     return res.data;
+        // }, err => {
+        //     debugger;
+        // });
         let res = await http.get("/api/gameinfo_niuniu");
         let config = res.data.config;
-        this.connectSocket(config.ip, config.port);
+        if (isInit) {
+            this.connectSocket(config.ip, config.port);
+        }
         return res.data;
     }
 
@@ -69,6 +82,15 @@ class WeixinPlatform extends egret.EventDispatcher implements Platform {
     async getDealerMoney(gameId: number) {
         let res = await http.get("/api/get_total_banker", { params: { game_id: gameId } });
         return res.data;
+    }
+
+    async exchangeCoin(amount: number, type: EXCHANGE_TYPE) {
+        let data = {
+            num: amount,
+            type_for: type,
+            type: 1
+        };
+        return await http.post("/api/exchangecoin", { data });
     }
 
     async getGameState() {

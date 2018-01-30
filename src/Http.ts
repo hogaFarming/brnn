@@ -83,7 +83,7 @@ class Http {
                     reject(e);
                 }
             }, this);
-            request.addEventListener(egret.IOErrorEvent.IO_ERROR, (event: egret.IOErrorEvent) => {
+            request.addEventListener(egret.IOErrorEvent.IO_ERROR, async (event: egret.IOErrorEvent) => {
                 console.log("http get error", event);
                 try {
                     let req = <egret.HttpRequest>event.currentTarget;
@@ -91,12 +91,26 @@ class Http {
                     if (res.error_code === "NO LOGIN") {
                         utils.cache.set("isLogin", 0);
                         utils.cache.set("isAuth", 0);
-                        platform.login();
+                        console.log("未登录");
+                        await platform.login();
+                        console.log("重新发送请求");
+                        this._request(url, options).then(resolve, reject);
+                    } else if (res.error_code === "AUTHORIZATION_INVALID") {
+                        utils.cache.set("isLogin", 2);
+                        utils.cache.set("isAuth", 0);
+                        utils.cache.remove("http_api_token");
+                        console.log("token过期");
+                        await this.getApiToken();
+                        console.log("重新发送请求");
+                        this._request(url, options).then(resolve, reject);
+                    } else {
+                        let errMsg = res.error_msg || "网络连接出错";
+                        reject(new Error(errMsg));
                     }
                 } catch (e) {
-                    console.error(event);
+                    reject(e);
+                    console.error(e);
                 }
-                reject(event);
             }, this);
         });
     }

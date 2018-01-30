@@ -73,6 +73,23 @@ var utils = {
     unixTime: function (unixTime) {
         var date = new Date(unixTime * 1000);
         return date.getHours() + ":" + date.getMinutes() + ":" + date.getSeconds();
+    },
+    isNumber: function (input) {
+        var num = +input;
+        if (isNaN(num)) {
+            return false;
+        }
+        return true;
+    },
+    coinToFufen: function (coin) {
+        if (!app.game.exchange_rate)
+            return 0;
+        return Math.floor(coin * app.game.exchange_rate);
+    },
+    fufenToCoin: function (fufen) {
+        if (!app.game.exchange_rate)
+            return 0;
+        return Math.floor(fufen / app.game.exchange_rate);
     }
 };
 //# sourceMappingURL=utils.js.map
