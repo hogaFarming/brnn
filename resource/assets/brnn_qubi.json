@@ -1,0 +1,7 @@
+{"file":"brnn_qubi.png","frames":{
+"confirmBtn":{"x":309,"y":438,"w":147,"h":50,"offX":0,"offY":0,"sourceW":147,"sourceH":50},
+"confirmBtn2":{"x":160,"y":437,"w":147,"h":50,"offX":0,"offY":0,"sourceW":147,"sourceH":50},
+"duihuanBtn":{"x":1,"y":437,"w":157,"h":51,"offX":0,"offY":0,"sourceW":157,"sourceH":51},
+"inputBG":{"x":1,"y":385,"w":418,"h":50,"offX":0,"offY":0,"sourceW":418,"sourceH":50},
+"qubiBG":{"x":1,"y":1,"w":573,"h":382,"offX":0,"offY":0,"sourceW":573,"sourceH":382},
+"qubiBtn":{"x":421,"y":385,"w":157,"h":51,"offX":0,"offY":0,"sourceW":157,"sourceH":51}}}
